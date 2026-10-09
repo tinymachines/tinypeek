@@ -1,6 +1,6 @@
 # The tm:// Stack — What MCP Gives Us, What We Built, and Where to Stop
 
-**Companion to the [tm:// Protocol Spec v0.2](../spec/tm-protocol-spec.md) · 2026-10-08**
+**Companion to the [tm:// Protocol Spec v0.3](../spec/tm-protocol-spec.md) · 2026-10-09**
 
 This is the plain-language version. The spec says *what* the protocol is; this says *why it's shaped that way* and how to think about building on it.
 
@@ -73,11 +73,11 @@ You can hand someone the grammar and they can construct an address for something
 
 ### Resolver — done when every URI returns content plus typed links
 
-The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. Remaining gaps are known and ticketed: the http default facet (TM-4), ranked `nearest` suggestions (TM-5), facet errors on collections (TM-11).
+The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. One gap remains: an unsupported facet on a collection is still ignored rather than refused (TM-11). The http default facet (TM-4) and ranked `nearest` suggestions (TM-5) shipped.
 
 ### Link vocabulary — done when the set of relations is closed and documented
 
-A client should traverse the graph knowing only the rel names, not how any mount computes them. The discipline: **a new relation is a vocabulary change, not a resolver change.** If adding `tm:measures` forces a resolver restructure, the cut slipped. Remaining gaps: lineage that stops short (TM-7) and link fan-out (TM-18).
+A client should traverse the graph knowing only the rel names, not how any mount computes them. The discipline: **a new relation is a vocabulary change, not a resolver change.** If adding `tm:measures` forces a resolver restructure, the cut slipped. Lineage now walks to an explicit `offbox` node (TM-7) and fan-out is bounded (TM-18), so this layer meets its test. The `offbox` mount is also the first real check of layer 2: a fourth mount arrived without a grammar change.
 
 ### Applications — everything semantic
 
@@ -117,10 +117,11 @@ Keep scope honest: each new area is valuable only if it fits the existing layers
 
 ---
 
-## 7. Status snapshot (2026-10-08)
+## 7. Status snapshot (2026-10-09)
 
-- **Fixed and verified:** text files served as text (TM-1), complete section listings (TM-3), lesson page ↔ cartridge links (TM-6), exact page data links (TM-8), mount-root `up` (TM-10), exact `read-by` (TM-14).
-- **Open:** http default facet (TM-4), ranked `nearest` (TM-5), full lineage (TM-7), deny-list too broad (TM-9), collection facet errors (TM-11), orientation at connect (TM-12), link fan-out (TM-18).
+- **Fixed and verified:** TM-1, TM-3, TM-4, TM-5, TM-6, TM-7, TM-8, TM-9, TM-10, TM-14, TM-18.
+- **Open:** collection facet errors (TM-11), orientation at connect (TM-12), the spec catching up with the server (TM-13; this revision).
+- **Unverified from outside:** binary through `?as=raw` (TM-2), the CI link crawler (TM-15).
 - **Not started:** entity mount (TM-16), completions (TM-17).
 
 Full detail lives in the work package.

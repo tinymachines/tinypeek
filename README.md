@@ -41,7 +41,7 @@ MCP gives you addresses and a read verb. It doesn't give you a graph between the
 
 ## Reference deployment
 
-The `tinymachines` server runs the protocol live over its `fs`, `git` and `http` mounts. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
+The `tinymachines` server runs the protocol live over its `fs`, `git`, `http` and `offbox` mounts, and serves this repository at `tm://tinymachines/git/tinypeek/`. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
 
 ## License
 

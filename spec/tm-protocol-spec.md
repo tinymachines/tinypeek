@@ -1,8 +1,8 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.2 · 2026-10-08 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.3 · 2026-10-09 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
-Supersedes v0.1 (2026-10-06). This revision brings the spec in line with the server that shipped on `tinymachines`, adds the layer model and its "done" criteria, and marks every section with its conformance status.
+Supersedes v0.2 (2026-10-08). v0.3 records the second batch of fixes verified on the live `tinymachines` server on 2026-10-09: the http default facet (TM-4), ranked `nearest` (TM-5), the build chain to an `offbox` mount (TM-7), the dotfile deny-list (TM-9) and bounded link fan-out (TM-18). v0.2 added the layer model and per-section conformance markers.
 
 Conformance markers used throughout:
 
@@ -45,8 +45,8 @@ The stack is five layers. Each depends only on the one below it, and each has a 
 |---|---|---|---|
 | 1 Transport | Session, capabilities, auth, the `resolve` tool | A new mount or rel needs no transport change | [shipped] |
 | 2 Addressing | The URI grammar and templates | Any thing on the box has a URI; adding a mount doesn't change the grammar | [shipped] — `fs`, `git`, `http` all fit one shape |
-| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial] — TM-4, TM-5, TM-11 |
-| 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [partial] — TM-7, TM-18 |
+| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial] — TM-11 |
+| 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [shipped] — every rel the server emits is in §9 |
 | 5 Applications | Everything semantic | Built without touching layers 1–4 | [planned] — TM-16 is the first test |
 
 **The platform is layers 1–4.** Its finish line is: *every real thing on the box is addressable and resolvable with typed links.* Everything above is an application, and each application is a test of whether the platform was really finished.
@@ -121,6 +121,7 @@ tm://{host}/
 tm://{host}/fs{/path*}{?as,range}
 tm://{host}/git/{repo}{/path*}{?at,as,n,range}
 tm://{host}/http/{site}{/path*}{?as}
+tm://{host}/offbox/{name}
 ```
 
 ### Mounts on `tinymachines`
@@ -128,8 +129,11 @@ tm://{host}/http/{site}{/path*}{?as}
 | Mount | Contents |
 |---|---|
 | `fs/` | `docs/`, `data/`, `notes/` |
-| `git/` | `2a03`, `2c02`, `6502`, `halfphi`, `nes`, `nes-bench`, `nes-bus`, `ntsc-crt`, `public` |
+| `git/` | `2a03`, `2c02`, `6502`, `halfphi`, `nes`, `nes-bench`, `nes-bus`, `ntsc-crt`, `public`, `tinypeek` |
 | `http/` | `tinymachines.ai`, `beta.tinymachines.ai`; both serve an `/ja` locale |
+| `offbox/` | Named inputs a build chain reads that no repository holds: `autopsy-models`, `cartridges`. Each describes itself and is never exposed (§8). |
+
+The fourth mount arrived without a grammar change, which is the layer-2 test from §2 passing in practice.
 
 ---
 
@@ -137,7 +141,7 @@ tm://{host}/http/{site}{/path*}{?as}
 
 | `as=` | Applies to | Returns | Status |
 |---|---|---|---|
-| `text` | http | Readable extraction of the rendered page. **Default for http.** | [partial] — TM-4: default is still raw HTML |
+| `text` | http | Readable extraction of the rendered page. **Default for http.** | [shipped] — TM-4 |
 | `rendered` | http | The HTML a visitor gets | [shipped] |
 | `raw` | fs, git | Bytes with the backend mimeType; base64 `blob` for binary | [partial] — TM-2 unverified |
 | `stat` | all | Metadata plus links, no content | [shipped] |
@@ -159,8 +163,8 @@ Never a bare 404. Every failure is structured and, where possible, teaches the c
 
 | Code | When | Carries |
 |---|---|---|
-| `not-found` | No such path | `nearest`: up to five siblings ranked by edit distance [partial — TM-5: still alphabetical] |
-| `no-such-ref` | Bad `at=` | Real branches and tags, ranked [partial — TM-5: returns empty] |
+| `not-found` | No such path | `nearest`: up to five siblings ranked by edit distance [shipped — TM-5: `pyle.md` suggests `pile.md` first] |
+| `no-such-ref` | Bad `at=` | Real branches and tags, ranked [shipped — TM-5] |
 | `too-large` | Over the byte cap | Byte size and a `?range=` template |
 | `binary` | Binary content without `as=raw` | mimeType and a `?as=stat` link |
 | `bad-facet` | Unsupported `as=` | The facets that path accepts |
@@ -192,14 +196,18 @@ The one part with no off-the-shelf answer: knowing that a page was produced by a
 
 Every `tm:` link carries `confidence: exact | inferred | low`.
 
-**Off-box terminals.** When a lineage chain leaves the box by design, it ends at an explicit node rather than in silence:
+**Off-box terminals.** When a lineage chain leaves the box by design, it ends at an explicit node in the `offbox` mount rather than in silence. An `offbox` resource has no content, only a description and links:
 
 ```
-tm://tinymachines/offbox/listings
-→ { "reason": "not-exposed", "what": "per-game listings, kept with the cartridges" }
+tm://tinymachines/offbox/autopsy-models
+→ { "exposed": false, "reason": "not-exposed",
+    "what": "Each game's model.json and summary.json, ...",
+    "why":  "They are made from cartridge dumps and kept with them; ..." }
+  tm:generated-by → git/public/wasm/listing/tools/autopsy.py   exact
+  tm:input-of     → git/public/scripts/board-autopsy.py         exact
 ```
 
-[planned — TM-7]
+The full chain now walks, all `exact`: `fs/data/autopsy.json` → `tm:generated-by` → `board-autopsy.py` → `tm:input` → `offbox/autopsy-models` → `tm:generated-by` → `wasm/listing/tools/autopsy.py`. [shipped — TM-7]
 
 ---
 
@@ -210,7 +218,8 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | rel | From → To | Meaning | Status |
 |---|---|---|---|
 | `tm:source` / `tm:renders-as` | page ↔ route source or cartridge | What emitted this page; inverse | [shipped] — incl. lesson page ↔ `prg.s`, `chr.s`, `lesson.json`, `three.txt` |
-| `tm:generated-by` / `tm:generates` | output ↔ generator | The computation whose output this is | [partial] — TM-7 |
+| `tm:generated-by` / `tm:generates` | output ↔ generator | The computation whose output this is | [shipped] — TM-7 |
+| `tm:input` / `tm:input-of` | script ↔ what it reads | An input the computation consumes, typically an `offbox` node | [shipped] — TM-7 |
 | `tm:data` / `tm:read-by` | page ↔ dataset | Data the page itself reads at render time | [shipped] — layout data excluded |
 | `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
@@ -226,7 +235,7 @@ Rules:
 - Inverse pairs are both emitted.
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
 - `href` is always a complete `tm://` URI.
-- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection; other sites and locales are reached through `alternate`. Larger sets page behind `?as=links&cursor=`. Target: at most ~10 links of one rel on any resource. [planned — TM-18; `autopsy.json` currently carries ~95 `tm:read-by`]
+- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection; other sites and locales are reached through `alternate`. Larger sets page behind `?as=links&cursor=`. Target: at most ~10 links of one rel on any resource. [shipped — TM-18: `autopsy.json` carries five `tm:read-by`, one of them the `/autopsy/games/` collection]
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
 
@@ -290,7 +299,7 @@ New rels (`tm:found-in`, `tm:instance`, …) are additions to the vocabulary tab
 
 ## 12. Open questions and v2
 
-- **Manifest schema.** Settle `tm-links.json` and which build step emits it; this gates `exact` on every lineage link (TM-7).
+- **Manifest schema.** Lineage is `exact` today (TM-7) without a separate `tm-links.json`. Decide whether a portable manifest is still worth specifying for other deployments.
 - **Multi-host.** One server per box, or one fronting several? The grammar allows both.
 - **Subscriptions.** `resources/subscribe` for change notification. Defer until a use appears.
 - **CI conformance.** A link-integrity crawler on every deploy: every `href` resolves, no `up` loops, every `tm:` rel has its inverse, every listed child resolves with the claimed mimeType (TM-15).
