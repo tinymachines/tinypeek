@@ -248,7 +248,7 @@ Read-only removes write risk, not disclosure or availability risk.
 |---|---|
 | Escape from a mount root | Canonicalize before every fs call; plain and `%2e%2e` traversal → `out-of-root`. Symlinks outside the root are refused. |
 | Unbounded reads | Byte cap per read; `?range=` beyond it; `list` pages at most 500. |
-| Secrets in the tree | Deny-list applied before any read: the `.git/` directory and credential patterns (`.env*`, `*.pem`, `id_*`, `*secret*`, `.netrc`). Refused as `denied`, listed as `redacted`. [partial — TM-9: still matches `.git*`, which wrongly blocks `.gitignore` and `.gitmodules`] |
+| Secrets in the tree | Deny-list applied before any read: the `.git/` directory, credential patterns (`.env*`, `*.pem`, `*.key`, `id_*`, `*secret*`) and every other dotfile as a class, so one nobody listed (`.npmrc`, `.netrc`, `.git-credentials`) stays out. Named back in because they hold no secrets and describe the repository: `.gitignore`, `.gitmodules`, `.gitattributes`, `.editorconfig`. Refused as `denied`, listed as `redacted`. [shipped: TM-9] |
 | Token exposure | Bearer token in the `Authorization` header, never in the URI. OAuth 2.1 when a second client appears. |
 | Open proxy | The http mount fetches from loopback only. |
 | Request abuse | Per-token rate limit; `complete` capped at 100; no recursive `list`. |
