@@ -15,7 +15,7 @@ A server offers two main kinds of thing:
 - **Tools** — actions the client calls. Ours: `resolve`, `overview`, `piece`, `licensing`.
 - **Resources** — read-only, addressable data, each with a URI and a mimeType.
 
-We went tools-first with a single `resolve(uri)` verb because, in practice, tool-first clients navigate tools more fluidly than raw resources. That was an open question in the first spec; the audit settled it.
+We speak both. The namespace is served as MCP resources, and a single `resolve(uri)` tool reads the same URIs, because in practice tool-first clients navigate tools more fluidly than raw resources. That was an open question in the first spec; the audit settled it.
 
 ---
 
@@ -69,15 +69,15 @@ If adding a feature makes you reach down and modify the addressing scheme, the c
 
 ### Addressing — done when any thing has a URI and the grammar never changes
 
-You can hand someone the grammar and they can construct an address for something you've never discussed. The proof: `fs`, `git` and `http` all fit the same shape. Adding a mount did not change the scheme. **This layer is effectively done. Lock it.**
+You can hand someone the grammar and they can construct an address for something you've never discussed. The proof: `fs`, `git` and `http` all fit the same shape, and when `offbox` arrived (TM-7) it fit too. Adding a mount did not change the scheme. **This layer is effectively done. Lock it.**
 
 ### Resolver — done when every URI returns content plus typed links
 
-The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. One gap remains: an unsupported facet on a collection is still ignored rather than refused (TM-11). The http default facet (TM-4) and ranked `nearest` suggestions (TM-5) shipped.
+The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. The http default facet (TM-4) and ranked `nearest` suggestions (TM-5) are done. The one gap left is ticketed: facet errors on collections (TM-11).
 
 ### Link vocabulary — done when the set of relations is closed and documented
 
-A client should traverse the graph knowing only the rel names, not how any mount computes them. The discipline: **a new relation is a vocabulary change, not a resolver change.** If adding `tm:measures` forces a resolver restructure, the cut slipped. Lineage now walks to an explicit `offbox` node (TM-7) and fan-out is bounded (TM-18), so this layer meets its test. The `offbox` mount is also the first real check of layer 2: a fourth mount arrived without a grammar change.
+A client should traverse the graph knowing only the rel names, not how any mount computes them. The discipline: **a new relation is a vocabulary change, not a resolver change.** If adding `tm:measures` forces a resolver restructure, the cut slipped. Full lineage (TM-7) and bounded fan-out (TM-18) are done, and `tm:input` arrived without a resolver change, so by its own test this layer is finished.
 
 ### Applications — everything semantic
 
@@ -119,9 +119,9 @@ Keep scope honest: each new area is valuable only if it fits the existing layers
 
 ## 7. Status snapshot (2026-10-09)
 
-- **Fixed and verified:** TM-1, TM-3, TM-4, TM-5, TM-6, TM-7, TM-8, TM-9, TM-10, TM-14, TM-18.
-- **Open:** collection facet errors (TM-11), orientation at connect (TM-12), the spec catching up with the server (TM-13; this revision).
-- **Unverified from outside:** binary through `?as=raw` (TM-2), the CI link crawler (TM-15).
-- **Not started:** entity mount (TM-16), completions (TM-17).
+- **Fixed and live:** text files served as text (TM-1), binary content through `?as=raw` (TM-2), complete section listings (TM-3), text as an http page's default (TM-4), ranked `nearest` (TM-5), lesson page ↔ cartridge links (TM-6), full lineage with `offbox` (TM-7), exact page data links (TM-8), the deny-list narrowed (TM-9), mount-root `up` (TM-10), exact `read-by` (TM-14), a link crawler on every deploy (TM-15), bounded fan-out (TM-18), and this spec brought up to date (TM-13).
+- **Open:** collection facet errors (TM-11), orientation at connect (TM-12).
+- **Not started:** entity mount (TM-16).
+- **Not a bug:** completions (TM-17) exist; the auditing client never called them.
 
 Full detail lives in the work package.

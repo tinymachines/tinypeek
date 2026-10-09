@@ -2,7 +2,7 @@
 
 **Version 0.3 · 2026-10-09 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
-Supersedes v0.2 (2026-10-08). v0.3 records the second batch of fixes verified on the live `tinymachines` server on 2026-10-09: the http default facet (TM-4), ranked `nearest` (TM-5), the build chain to an `offbox` mount (TM-7), the dotfile deny-list (TM-9) and bounded link fan-out (TM-18). v0.2 added the layer model and per-section conformance markers.
+Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log).
 
 Conformance markers used throughout:
 
@@ -44,9 +44,9 @@ The stack is five layers. Each depends only on the one below it, and each has a 
 | Layer | Owns | Done when | Status |
 |---|---|---|---|
 | 1 Transport | Session, capabilities, auth, the `resolve` tool | A new mount or rel needs no transport change | [shipped] |
-| 2 Addressing | The URI grammar and templates | Any thing on the box has a URI; adding a mount doesn't change the grammar | [shipped] — `fs`, `git`, `http` all fit one shape |
-| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial] — TM-11 |
-| 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [shipped] — every rel the server emits is in §9 |
+| 2 Addressing | The URI grammar and templates | Any thing on the box has a URI; adding a mount doesn't change the grammar | [shipped]: `fs`, `git`, `http` and `offbox` all fit one shape (`offbox` was added in TM-7 without a grammar change) |
+| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial]: TM-11 (a collection ignores an unsupported facet) |
+| 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [shipped]: TM-7, TM-8, TM-14, TM-18 |
 | 5 Applications | Everything semantic | Built without touching layers 1–4 | [planned] — TM-16 is the first test |
 
 **The platform is layers 1–4.** Its finish line is: *every real thing on the box is addressable and resolvable with typed links.* Everything above is an application, and each application is a test of whether the platform was really finished.
@@ -71,11 +71,11 @@ Nothing in layers 1–3 is novel protocol. The original contribution is layer 4:
 | Generate a URI from rules | MCP Resource Templates, RFC 6570 | MCP spec; RFC 6570 | [shipped] |
 | A safe `ls` | `resources/list` with cursor pagination | MCP pagination | [shipped] |
 | Resolve into content | `resources/read`: text or blob + `mimeType` | MCP spec | [shipped] via `resolve` |
-| Back-and-forth negotiation | `completion/complete` on template arguments | MCP completions | [planned] — TM-17 |
+| Back-and-forth negotiation | `completion/complete` on template arguments | MCP completions | [shipped]: `repo`, `site`, `path`, `as`, `at` and `n` complete from live values (TM-17 was filed against a client that never calls it) |
 | The OS is the namespace | Plan 9 / 9P mounts; MCP Roots | Plan 9; MCP roots | [shipped] |
-| Page ↔ source ↔ history joins | HATEOAS; typed `rel` links | RFC 8288 | [partial] |
+| Page ↔ source ↔ history joins | HATEOAS; typed `rel` links | RFC 8288 | [shipped] |
 | Facets | Representation in query params, never path suffixes | RFC 3986 | [shipped] |
-| Token handling | Bearer in header; OAuth 2.1 for remote clients | MCP authorization; RFC 6750 | [shipped] |
+| Token handling | Bearer in header; OAuth 2.1 for remote clients | MCP authorization; RFC 6750 | [planned]: the live server is anonymous and read-only, with no token at all |
 | Make the thing I asked for | MCP Tools + Elicitation | MCP spec | v2 |
 
 Verify method names against the current revision at [modelcontextprotocol.io](https://modelcontextprotocol.io) before coding; field names drift between revisions.
@@ -84,7 +84,7 @@ Verify method names against the current revision at [modelcontextprotocol.io](ht
 
 ## 4. Transport and session [shipped]
 
-The server exposes MCP **tools** rather than relying on the client to browse raw resources, because tool-first clients navigate tools more fluidly. This resolves v0.1's open question in favour of the shim.
+The server speaks both: MCP **resources** (`resources/list`, `resources/templates/list`, `resources/read`, `completion/complete`) and a `resolve` **tool** over the same URIs, because tool-first clients navigate tools more fluidly. Over resources the links ride in the read result's `_meta` under `tinymachines.ai/links`; through `resolve` they are in the body.
 
 | Tool | Purpose |
 |---|---|
@@ -95,7 +95,7 @@ The server exposes MCP **tools** rather than relying on the client to browse raw
 
 The namespace is unchanged by the shim: `resolve` is a transport convenience over layers 2–3, not a different protocol.
 
-**Orientation.** The server `instructions` and the root resource should name the box's own orientation documents (`git/public/START-HERE.md`, `git/public/CLAUDE.md`, `git/6502/CLAUDE.md`) so a fresh session does not start cold. [planned — TM-12]
+**Orientation.** The server sends `instructions` at `initialize` describing the mounts, the links and how to begin [shipped]. They and the root resource should also name the box's own orientation documents (`git/public/START-HERE.md`, `git/public/CLAUDE.md`, `git/6502/CLAUDE.md`) so a fresh session does not start cold. [planned: TM-12]
 
 ---
 
@@ -118,11 +118,13 @@ Published templates (RFC 6570):
 
 ```
 tm://{host}/
-tm://{host}/fs{/path*}{?as,range}
-tm://{host}/git/{repo}{/path*}{?at,as,n,range}
+tm://{host}/fs{/path*}
+tm://{host}/git/{repo}{/path*}{?at,as,n}
 tm://{host}/http/{site}{/path*}{?as}
 tm://{host}/offbox/{name}
 ```
+
+These are the templates the live server publishes. It also accepts `as` and `range` on `fs`, `range` on `git`, and `cursor` on any collection, which the templates do not name. [shipped]
 
 ### Mounts on `tinymachines`
 
@@ -131,7 +133,7 @@ tm://{host}/offbox/{name}
 | `fs/` | `docs/`, `data/`, `notes/` |
 | `git/` | `2a03`, `2c02`, `6502`, `halfphi`, `nes`, `nes-bench`, `nes-bus`, `ntsc-crt`, `public`, `tinypeek` |
 | `http/` | `tinymachines.ai`, `beta.tinymachines.ai`; both serve an `/ja` locale |
-| `offbox/` | Named inputs a build chain reads that no repository holds: `autopsy-models`, `cartridges`. Each describes itself and is never exposed (§8). |
+| `offbox/` | Where a build chain leaves the box: `autopsy-models`, `cartridges`. Named and described, never served (§8) |
 
 The fourth mount arrived without a grammar change, which is the layer-2 test from §2 passing in practice.
 
@@ -141,17 +143,17 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 
 | `as=` | Applies to | Returns | Status |
 |---|---|---|---|
-| `text` | http | Readable extraction of the rendered page. **Default for http.** | [shipped] — TM-4 |
+| `text` | http | Readable extraction of the rendered page's main element. **Default for an http page.** Something that is not a page (robots.txt, a picture) reads as itself with no facet | [shipped]: TM-4 |
 | `rendered` | http | The HTML a visitor gets | [shipped] |
-| `raw` | fs, git | Bytes with the backend mimeType; base64 `blob` for binary | [partial] — TM-2 unverified |
-| `stat` | all | Metadata plus links, no content | [shipped] |
+| `raw` | fs, git | Bytes with the backend mimeType; base64 `blob` for binary. The default for fs and git files; `resolve` returns the blob only when `as=raw` is asked for | [shipped]: TM-2 |
+| `stat` | fs, git, http, offbox | Metadata plus links, no content. For http: status, contentType and size, fetched without following a redirect | [shipped] |
 | `log` | git | Commits touching the path | [shipped] |
 | `blame` | git | Line attribution | [shipped] |
-| `tree` | git collections | Recursive tree JSON, depth-capped | [planned] — TM-11 |
+| `tree` | git | The listing of a tree, one level, paged; the default for a git collection | [partial]: recursive and depth-capped is not built |
 
-Other params: `at=<ref>` (git; defaults to HEAD), `n=<count>` (log), `range=<start>-<end>` (byte range beyond the cap).
+Other params: `at=<ref>` (git; defaults to HEAD, and for `6502` to the commit the site serves), `n=<count>` (log, 1 to 100, default 20), `range=<start>-<end>` (fs and git; bytes `[start, end)` beyond the cap), `cursor=` (the `nextCursor` of a paged listing).
 
-**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. [partial — collections still ignore it silently, TM-11]
+**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. [partial: TM-11, an `as` that the mount offers but a collection has no use for is still ignored silently]
 
 MimeType is decided by content as well as extension: valid UTF-8 with no NUL bytes in the first 8 KiB is text. Assembly sources return `text/x-asm`. [shipped]
 
@@ -163,13 +165,20 @@ Never a bare 404. Every failure is structured and, where possible, teaches the c
 
 | Code | When | Carries |
 |---|---|---|
-| `not-found` | No such path | `nearest`: up to five siblings ranked by edit distance [shipped — TM-5: `pyle.md` suggests `pile.md` first] |
-| `no-such-ref` | Bad `at=` | Real branches and tags, ranked [shipped — TM-5] |
-| `too-large` | Over the byte cap | Byte size and a `?range=` template |
+| `not-found` | No such path | `nearest`: up to five names ranked by edit distance, then a shared start, then alphabetically for ties; a path whose directory is missing answers from the deepest one that exists [shipped: TM-5] |
+| `no-such-ref` | Bad `at=` | Up to five real refs (HEAD, branches, tags), ranked the same way [shipped: TM-5] |
+| `bad-facet` (on `at=`) | An `at=` that is not a ref name (`..`, a leading `-`, a space) | Refused before git sees it |
+| `too-large` | Over the byte cap | Byte size and a `?range=` template; for an http page, its `?as=text` and `?as=stat` |
 | `binary` | Binary content without `as=raw` | mimeType and a `?as=stat` link |
 | `bad-facet` | Unsupported `as=` | The facets that path accepts |
 | `out-of-root` | Traversal outside a mount (plain or percent-encoded) | — |
-| `denied` | Matches the deny-list | — (the path is listed as `redacted`) |
+| `denied` | Matches the deny-list | (the path is listed as `redacted`) |
+| `redirect` | An http path the site redirects | The status; `?as=stat` reports it without following |
+| `unreachable` | An http path that answers 4xx (other than 404) or 5xx | The status |
+| `bad-uri` | Not a string, or not a `tm://` URI | |
+| `bad-cursor` | A `cursor=` the server did not issue | |
+| `bad-argument`, `bad-ref` | A completion for a template argument that does not exist, or for something other than a resource template | |
+| `timeout`, `git-error` | git took too long or failed | The message |
 
 ---
 
@@ -179,9 +188,9 @@ A mount is any backend that implements three operations and one optional one. Ad
 
 | Operation | Input | Output | Required |
 |---|---|---|---|
-| `list(path, cursor)` | Collection | Children as URIs with `name`, `mimeType`, `size`, `isCollection`; `nextCursor` | yes |
+| `list(path, cursor)` | Collection | Children as URIs with `name`, `mimeType`, `size`, `isCollection`; `nextCursor`. An entry may also carry `redacted: true` (on the deny-list: listed, never read), `submodule` (git) or `title` (an http page, from the build). A site's root lists its sections and names its `front_page` | yes [shipped] |
 | `read(path, facet)` | Leaf + facets | Content + `mimeType` + `links` | yes |
-| `complete(arg, prefix)` | Template argument + prefix | Up to 100 values, `hasMore` | yes [planned — TM-17] |
+| `complete(arg, prefix)` | Template argument + prefix | Up to 100 values, `hasMore` | yes [shipped] |
 | `links(path)` | Any path | The `links` array without content (`?as=stat`) | optional [shipped] |
 
 Collections listed by a mount must be complete. For `http`, dynamic routes (`[game]`, `[lesson]`) are enumerated from the framework's build output, not a hand-kept route list. [shipped — TM-3]
@@ -190,24 +199,26 @@ Collections listed by a mount must be complete. For `http`, dynamic routes (`[ga
 
 The one part with no off-the-shelf answer: knowing that a page was produced by a given source file and reads a given dataset. Three sources, tried in order:
 
-1. **Build manifest** (preferred). The build emits `tm-links.json`: per route, its `source`, `generated-by` and `data`. Exact.
-2. **Route and import introspection.** The framework's route table and import graph. Exact where available. [shipped — used for TM-8, TM-14]
-3. **Heuristic.** Path-shape matching. Always `confidence: low`.
+1. **What a record says of itself.** A data record's own note naming its writer (`Written only by scripts/…`) makes that `tm:generated-by` exact. [shipped: TM-7]
+2. **The build's own output.** The framework's prerender manifest lists every page a route renders, dynamic routes included (`tm:source` / `tm:renders-as`, exact); each page's server bundle and its source maps confirm which reader modules ship with it. [shipped: TM-3, TM-8]
+3. **Route and import introspection.** A module reads a record when it builds the record's path or imports it, never when a comment names it. A page's data is what its own code reads, through the library but never through the shared frame's modules: exact for a reader the page imports itself, inferred further down. [shipped: TM-8, TM-14]
+4. **A small manifest** for what nothing above can see: what a script reads that it did not make, and where the chain leaves the box. On `tinymachines` this is `api/lineage.json`, and a test holds every path it names to be tracked. Exact. [shipped: TM-7]
+5. **Heuristic.** A script under `scripts/` that names a record it is not stated to write: `inferred`.
 
-Every `tm:` link carries `confidence: exact | inferred | low`.
+Every `tm:` link carries `confidence: exact | inferred | low`. The live server emits `exact` and `inferred`; `low` is reserved for path-shape guesses, which it does not make.
 
-**Off-box terminals.** When a lineage chain leaves the box by design, it ends at an explicit node in the `offbox` mount rather than in silence. An `offbox` resource has no content, only a description and links:
+**Off-box terminals.** When a lineage chain leaves the box by design, it ends at an explicit node in the `offbox` mount rather than in silence. The node says what it is and why it is not exposed, and links to what makes it and what reads it:
 
 ```
 tm://tinymachines/offbox/autopsy-models
 → { "exposed": false, "reason": "not-exposed",
     "what": "Each game's model.json and summary.json, ...",
-    "why":  "They are made from cartridge dumps and kept with them; ..." }
-  tm:generated-by → git/public/wasm/listing/tools/autopsy.py   exact
-  tm:input-of     → git/public/scripts/board-autopsy.py         exact
+    "why": "They are made from cartridge dumps and kept with them; ..." }
+  tm:generated-by  tm://tinymachines/git/public/wasm/listing/tools/autopsy.py  exact
+  tm:input-of      tm://tinymachines/git/public/scripts/board-autopsy.py        exact
 ```
 
-The full chain now walks, all `exact`: `fs/data/autopsy.json` → `tm:generated-by` → `board-autopsy.py` → `tm:input` → `offbox/autopsy-models` → `tm:generated-by` → `wasm/listing/tools/autopsy.py`. [shipped — TM-7]
+`data/autopsy.json` walks to `scripts/board-autopsy.py`, to the models off the box, to `wasm/listing/tools/autopsy.py`, to the cartridges off the box, every link exact. [shipped: TM-7]
 
 ---
 
@@ -218,9 +229,9 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | rel | From → To | Meaning | Status |
 |---|---|---|---|
 | `tm:source` / `tm:renders-as` | page ↔ route source or cartridge | What emitted this page; inverse | [shipped] — incl. lesson page ↔ `prg.s`, `chr.s`, `lesson.json`, `three.txt` |
-| `tm:generated-by` / `tm:generates` | output ↔ generator | The computation whose output this is | [shipped] — TM-7 |
-| `tm:input` / `tm:input-of` | script ↔ what it reads | An input the computation consumes, typically an `offbox` node | [shipped] — TM-7 |
-| `tm:data` / `tm:read-by` | page ↔ dataset | Data the page itself reads at render time | [shipped] — layout data excluded |
+| `tm:generated-by` / `tm:generates` | output ↔ generator; pulled copy ↔ its origin | The computation whose output this is, or the file a build copied in | [shipped]: TM-7 |
+| `tm:input` / `tm:input-of` | generator ↔ what it reads | What a script reads that it did not make (an `offbox` node on `tinymachines`) | [shipped]: TM-7 |
+| `tm:data` / `tm:read-by` | page or collection ↔ dataset | Data the page's own code reads at render time, the shared frame's excluded; a record names each route that reads it once (its page, or the collection a dynamic route's pages are listed in, which carries the `tm:data` back) | [shipped]: TM-8, TM-14, TM-18 |
 | `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
 | `latest-version` (IANA) | `?at=<ref>` → HEAD | Newest revision | [shipped] |
@@ -232,10 +243,10 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 Rules:
 
 - Links are typed, never free text. A client ignores rels it doesn't know.
-- Inverse pairs are both emitted.
+- Inverse pairs are both emitted. `tm:read-by` is the one bounded exception: a page on another site or in another locale is answered by the one link that stands for its route.
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
 - `href` is always a complete `tm://` URI.
-- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection; other sites and locales are reached through `alternate`. Larger sets page behind `?as=links&cursor=`. Target: at most ~10 links of one rel on any resource. [shipped — TM-18: `autopsy.json` carries five `tm:read-by`, one of them the `/autopsy/games/` collection]
+- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`. `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned].
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
 
@@ -255,13 +266,13 @@ Read-only removes write risk, not disclosure or availability risk.
 
 | Concern | Control |
 |---|---|
-| Escape from a mount root | Canonicalize before every fs call; plain and `%2e%2e` traversal → `out-of-root`. Symlinks outside the root are refused. |
+| Escape from a mount root | Canonicalize before every fs call; plain and `%2e%2e` traversal → `out-of-root`. Symlinks outside the root are refused. The http mount fetches only sites the box serves; git refs are checked as names before git sees them. |
 | Unbounded reads | Byte cap per read; `?range=` beyond it; `list` pages at most 500. |
 | Secrets in the tree | Deny-list applied before any read: the `.git/` directory, credential patterns (`.env*`, `*.pem`, `*.key`, `id_*`, `*secret*`) and every other dotfile as a class, so one nobody listed (`.npmrc`, `.netrc`, `.git-credentials`) stays out. Named back in because they hold no secrets and describe the repository: `.gitignore`, `.gitmodules`, `.gitattributes`, `.editorconfig`. Refused as `denied`, listed as `redacted`. [shipped: TM-9] |
-| Token exposure | Bearer token in the `Authorization` header, never in the URI. OAuth 2.1 when a second client appears. |
+| Token exposure | Bearer token in the `Authorization` header, never in the URI. OAuth 2.1 when a second client appears. [planned: the live server is anonymous; everything it serves is already public] |
 | Open proxy | The http mount fetches from loopback only. |
-| Request abuse | Per-token rate limit; `complete` capped at 100; no recursive `list`. |
-| Audit | Every read logged with URI, facet, bytes, token id. |
+| Request abuse | `complete` capped at 100; `list` pages at most 500; no recursive `list`; git calls time out after 15 s [shipped]. A per-token rate limit [planned: there is no token yet] |
+| Audit | Every read logged with URI, facet, bytes, token id. [planned: not built] |
 
 **Data licensing travels with the data.** Code is MIT. visual6502-derived die data is CC BY-NC-SA 3.0, and NonCommercial + ShareAlike carry through to the netlist, measured tables, API responses and cartridges. `halfphi` embeds no die data. The autopsy publishes shape only — addresses, counts, labels — and no ROM bytes. The `licensing` tool states this at runtime.
 
@@ -299,10 +310,10 @@ New rels (`tm:found-in`, `tm:instance`, …) are additions to the vocabulary tab
 
 ## 12. Open questions and v2
 
-- **Manifest schema.** Lineage is `exact` today (TM-7) without a separate `tm-links.json`. Decide whether a portable manifest is still worth specifying for other deployments.
+- **Manifest schema.** `tinymachines` settled for a small hand-kept `lineage.json` checked by a test, plus what records and the build already say (§8). Whether a framework-emitted `tm-links.json` is worth having is open.
 - **Multi-host.** One server per box, or one fronting several? The grammar allows both.
 - **Subscriptions.** `resources/subscribe` for change notification. Defer until a use appears.
-- **CI conformance.** A link-integrity crawler on every deploy: every `href` resolves, no `up` loops, every `tm:` rel has its inverse, every listed child resolves with the claimed mimeType (TM-15).
+- **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 2,300 URIs a run.
 
 v2, deliberately excluded:
 
