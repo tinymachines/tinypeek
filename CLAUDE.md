@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.3. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.4. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -89,11 +89,10 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 
 | | |
 |---|---|
-| TM-11, TM-19, TM-20 | A collection refuses a file's facet; a submodule reads as what it pins (`tm:pins`) and no refusal offers its own URI; a page links to itself in the other language and on the other site (`alternate`). Built and tested in `public`, waiting on a deploy. After it, re-check each live and move the spec's markers from planned to shipped |
 | **TM-12** | The connect instructions and the root resource should name the orientation documents (`public`'s `START-HERE.md` and `CLAUDE.md`, the 6502 project's `CLAUDE.md`). Open |
 | **TM-16** | An `entity` mount over `data/autopsy.json` and `data/lessons.json`: patterns, games, routines and lessons as addressable things with their own links. Spec section 11 has the shape. It is the test of whether layers 1 to 4 are finished: if it needs a change below it, that is the finding, not a workaround. Not started |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
-| everything else | Live, and marked so in the spec |
+| everything else | Live, and marked so in the spec (TM-11, 19 and 20 since 2026-10-10) |
 
 Also open in the spec: paging a large link set behind `?as=links&cursor=`;
 the git `tree` facet is one level, not recursive; tokens, a rate limit and
