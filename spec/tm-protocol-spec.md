@@ -193,7 +193,7 @@ A mount is any backend that implements three operations and one optional one. Ad
 | `complete(arg, prefix)` | Template argument + prefix | Up to 100 values, `hasMore` | yes [shipped] |
 | `links(path)` | Any path | The `links` array without content (`?as=stat`) | optional [shipped] |
 
-A git submodule is neither a tree nor a file of the repository that holds it: its commit lives in another repository. It reads as a record, `{type: "submodule", path, at, commit, pinned, url, repository}`, where `pinned` is the commit it pins, `url` comes from `.gitmodules` at that ref, and `repository` is the namespace URI of the pinned commit when the server also mounts that repository (else `null`). It links `tm:pins` there, and `?as=log` is the commits that moved the pin. It offers `stat` and `log`; `blame` is refused. [planned: TM-19, built, awaiting deploy]
+A git submodule is neither a tree nor a file of the repository that holds it: its commit lives in another repository. It reads as a record, `{mimeType, type: "submodule", path, at, commit, pinned, url, repository}`, where `mimeType` is `application/json` (what its listing claims), `pinned` is the commit it pins, `url` comes from `.gitmodules` at that ref, and `repository` is the namespace URI of the pinned commit when the server also mounts that repository and its copy has that commit (else `null`: a link that would not resolve is worse than none). It links `tm:pins` there, and `?as=log` is the commits that moved the pin. It offers `stat` and `log`; `blame` is refused. [planned: TM-19, built, awaiting deploy]
 
 Collections listed by a mount must be complete. For `http`, dynamic routes (`[game]`, `[lesson]`) are enumerated from the framework's build output, not a hand-kept route list. [shipped — TM-3]
 
@@ -239,7 +239,7 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
 | `latest-version` (IANA) | `?at=<ref>` → HEAD | Newest revision | [shipped] |
 | `alternate` (IANA) | any → same path, other facet | Another representation of one identity (`?as=rendered`, `?as=blame`) | [shipped] |
-| `alternate` (IANA) | page → the same page in another locale, or on another site | Another version of the page, its `title` naming which. The other locale only where the site's build made it; the other site wherever it serves the page. Symmetric | [planned: TM-20, built, awaiting deploy] |
+| `alternate` (IANA) | page → the same page in another locale, or on another site | Another version of the page, its `title` naming which. The other locale only where the site's build made both; the other site only where both sites serve the page. Each condition reads the same from either end, so every link is answered. A site's root is its front page as well as its top collection, so it carries the front page's versions too | [planned: TM-20, built, awaiting deploy] |
 | `up` (IANA) | any → parent | One level up; a mount root's `up` is `tm://<host>/` | [shipped] |
 | `collection` (IANA) | leaf → its listing | Siblings | [shipped] |
 | `describedby` (IANA) | any → `?as=stat` | Metadata | [shipped] |
@@ -250,6 +250,7 @@ Rules:
 - Inverse pairs are both emitted, and a cross-version `alternate` is answered by one back. `tm:read-by` is the one bounded exception: a page on another site or in another locale is answered by the one link that stands for its route.
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
 - `href` is always a complete `tm://` URI.
+- A collection is a URI whose path ends in `/`, whatever query follows it: `git/<repo>/?at=<commit>` is a tree, and a client wanting metadata reads it as it is, not with `?as=stat` added (TM-11 refuses that).
 - **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned].
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
