@@ -117,10 +117,11 @@ Keep scope honest: each new area is valuable only if it fits the existing layers
 
 ---
 
-## 7. Status snapshot (2026-10-09)
+## 7. Status snapshot (2026-10-10)
 
 - **Fixed and live:** text files served as text (TM-1), binary content through `?as=raw` (TM-2), complete section listings (TM-3), text as an http page's default (TM-4), ranked `nearest` (TM-5), lesson page ↔ cartridge links (TM-6), full lineage with `offbox` (TM-7), exact page data links (TM-8), the deny-list narrowed (TM-9), mount-root `up` (TM-10), exact `read-by` (TM-14), a link crawler on every deploy (TM-15), bounded fan-out (TM-18), and this spec brought up to date (TM-13).
-- **Open:** collection facet errors (TM-11), orientation at connect (TM-12).
+- **Built, waiting on a deploy:** a collection refuses a file's facet instead of dropping it (TM-11, the last part); a submodule reads as what it pins instead of looping (TM-19); a page links to itself in the other language and on the other site (TM-20).
+- **Open:** orientation at connect (TM-12).
 - **Not started:** entity mount (TM-16).
 - **Not a bug:** completions (TM-17) exist; the auditing client never called them.
 

@@ -84,12 +84,12 @@ Rebase onto theirs, keep both sides' substance, and say what you kept.
 ## What is left
 
 The owner's work package (a black-box audit of the namespace, TM-1 to
-TM-18) lives in the owner's docs folder beside these repositories, under
-`feedback/`. It is not in either repository. Its state on 2026-10-09:
+TM-20) lives in the owner's docs folder beside these repositories, under
+`feedback/`. It is not in either repository. Its state on 2026-10-10:
 
 | | |
 |---|---|
-| **TM-11** | An unsupported facet on a collection is ignored silently. It should answer `bad-facet` with the facets that path accepts, on fs, git and http alike. Open |
+| TM-11, TM-19, TM-20 | A collection refuses a file's facet; a submodule reads as what it pins (`tm:pins`) and no refusal offers its own URI; a page links to itself in the other language and on the other site (`alternate`). Built and tested in `public`, waiting on a deploy. After it, re-check each live and move the spec's markers from planned to shipped |
 | **TM-12** | The connect instructions and the root resource should name the orientation documents (`public`'s `START-HERE.md` and `CLAUDE.md`, the 6502 project's `CLAUDE.md`). Open |
 | **TM-16** | An `entity` mount over `data/autopsy.json` and `data/lessons.json`: patterns, games, routines and lessons as addressable things with their own links. Spec section 11 has the shape. It is the test of whether layers 1 to 4 are finished: if it needs a change below it, that is the finding, not a workaround. Not started |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |

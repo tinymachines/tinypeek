@@ -1,8 +1,8 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.3 · 2026-10-09 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.4 · 2026-10-10 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
-Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log).
+Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log). v0.4 adds what TM-11, TM-19 and TM-20 change: a collection refuses a file's facet instead of dropping it, a submodule reads as what it pins (`tm:pins`), a page links to itself in the other language and on the other site (`alternate`), and no refusal offers the address it refused. Both are built in the reference server and wait on its next deploy; their markers move to shipped once the live server does it.
 
 Conformance markers used throughout:
 
@@ -45,7 +45,7 @@ The stack is five layers. Each depends only on the one below it, and each has a 
 |---|---|---|---|
 | 1 Transport | Session, capabilities, auth, the `resolve` tool | A new mount or rel needs no transport change | [shipped] |
 | 2 Addressing | The URI grammar and templates | Any thing on the box has a URI; adding a mount doesn't change the grammar | [shipped]: `fs`, `git`, `http` and `offbox` all fit one shape (`offbox` was added in TM-7 without a grammar change) |
-| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial]: TM-11 (a collection ignores an unsupported facet) |
+| 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [partial]: TM-19, TM-20 and the rest of TM-11 are built and await a deploy |
 | 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [shipped]: TM-7, TM-8, TM-14, TM-18 |
 | 5 Applications | Everything semantic | Built without touching layers 1–4 | [planned] — TM-16 is the first test |
 
@@ -153,7 +153,7 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 
 Other params: `at=<ref>` (git; defaults to HEAD, and for `6502` to the commit the site serves), `n=<count>` (log, 1 to 100, default 20), `range=<start>-<end>` (fs and git; bytes `[start, end)` beyond the cap), `cursor=` (the `nextCursor` of a paged listing).
 
-**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. [partial: TM-11, an `as` that the mount offers but a collection has no use for is still ignored silently]
+**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. An unknown `as` is refused on every mount [shipped]. A collection offers only its listing (and, on git, `log`): a file's facet on one (`?as=stat` on an fs directory, `?as=rendered` on an http collection, `?as=stat` or `blame` on a git tree) is refused rather than dropped [planned: TM-11, built, awaiting deploy].
 
 MimeType is decided by content as well as extension: valid UTF-8 with no NUL bytes in the first 8 KiB is text. Assembly sources return `text/x-asm`. [shipped]
 
@@ -165,7 +165,7 @@ Never a bare 404. Every failure is structured and, where possible, teaches the c
 
 | Code | When | Carries |
 |---|---|---|
-| `not-found` | No such path | `nearest`: up to five names ranked by edit distance, then a shared start, then alphabetically for ties; a path whose directory is missing answers from the deepest one that exists [shipped: TM-5] |
+| `not-found` | No such path | `nearest`: up to five names ranked by edit distance, then a shared start, then alphabetically for ties; a path whose directory is missing answers from the deepest one that exists [shipped: TM-5]. `nearest` never contains the URI that was refused, which a client following it would take round forever; `x/` offered for `x` is a different address and allowed [planned: TM-19, built, awaiting deploy] |
 | `no-such-ref` | Bad `at=` | Up to five real refs (HEAD, branches, tags), ranked the same way [shipped: TM-5] |
 | `bad-facet` (on `at=`) | An `at=` that is not a ref name (`..`, a leading `-`, a space) | Refused before git sees it |
 | `too-large` | Over the byte cap | Byte size and a `?range=` template; for an http page, its `?as=text` and `?as=stat` |
@@ -188,10 +188,12 @@ A mount is any backend that implements three operations and one optional one. Ad
 
 | Operation | Input | Output | Required |
 |---|---|---|---|
-| `list(path, cursor)` | Collection | Children as URIs with `name`, `mimeType`, `size`, `isCollection`; `nextCursor`. An entry may also carry `redacted: true` (on the deny-list: listed, never read), `submodule` (git) or `title` (an http page, from the build). A site's root lists its sections and names its `front_page` | yes [shipped] |
+| `list(path, cursor)` | Collection | Children as URIs with `name`, `mimeType`, `size`, `isCollection`; `nextCursor`. An entry may also carry `redacted: true` (on the deny-list: listed, never read), `submodule: true` (git; it carries `mimeType: application/json` and reads as a submodule record, below) or `title` (an http page, from the build). A site's root lists its sections and names its `front_page` | yes [shipped] |
 | `read(path, facet)` | Leaf + facets | Content + `mimeType` + `links` | yes |
 | `complete(arg, prefix)` | Template argument + prefix | Up to 100 values, `hasMore` | yes [shipped] |
 | `links(path)` | Any path | The `links` array without content (`?as=stat`) | optional [shipped] |
+
+A git submodule is neither a tree nor a file of the repository that holds it: its commit lives in another repository. It reads as a record, `{type: "submodule", path, at, commit, pinned, url, repository}`, where `pinned` is the commit it pins, `url` comes from `.gitmodules` at that ref, and `repository` is the namespace URI of the pinned commit when the server also mounts that repository (else `null`). It links `tm:pins` there, and `?as=log` is the commits that moved the pin. It offers `stat` and `log`; `blame` is refused. [planned: TM-19, built, awaiting deploy]
 
 Collections listed by a mount must be complete. For `http`, dynamic routes (`[game]`, `[lesson]`) are enumerated from the framework's build output, not a hand-kept route list. [shipped — TM-3]
 
@@ -233,9 +235,11 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | `tm:input` / `tm:input-of` | generator ↔ what it reads | What a script reads that it did not make (an `offbox` node on `tinymachines`) | [shipped]: TM-7 |
 | `tm:data` / `tm:read-by` | page or collection ↔ dataset | Data the page's own code reads at render time, the shared frame's excluded; a record names each route that reads it once (its page, or the collection a dynamic route's pages are listed in, which carries the `tm:data` back) | [shipped]: TM-8, TM-14, TM-18 |
 | `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
+| `tm:pins` | submodule → repository at the pinned commit | The repository and commit a submodule names. Unpaired: a repository does not list everything that embeds it | [planned: TM-19, built, awaiting deploy] |
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
 | `latest-version` (IANA) | `?at=<ref>` → HEAD | Newest revision | [shipped] |
-| `alternate` (IANA) | any → same path, other facet, site or locale | Another representation of one identity | [shipped] |
+| `alternate` (IANA) | any → same path, other facet | Another representation of one identity (`?as=rendered`, `?as=blame`) | [shipped] |
+| `alternate` (IANA) | page → the same page in another locale, or on another site | Another version of the page, its `title` naming which. The other locale only where the site's build made it; the other site wherever it serves the page. Symmetric | [planned: TM-20, built, awaiting deploy] |
 | `up` (IANA) | any → parent | One level up; a mount root's `up` is `tm://<host>/` | [shipped] |
 | `collection` (IANA) | leaf → its listing | Siblings | [shipped] |
 | `describedby` (IANA) | any → `?as=stat` | Metadata | [shipped] |
@@ -243,10 +247,10 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 Rules:
 
 - Links are typed, never free text. A client ignores rels it doesn't know.
-- Inverse pairs are both emitted. `tm:read-by` is the one bounded exception: a page on another site or in another locale is answered by the one link that stands for its route.
+- Inverse pairs are both emitted, and a cross-version `alternate` is answered by one back. `tm:read-by` is the one bounded exception: a page on another site or in another locale is answered by the one link that stands for its route.
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
 - `href` is always a complete `tm://` URI.
-- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`. `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned].
+- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned].
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
 
