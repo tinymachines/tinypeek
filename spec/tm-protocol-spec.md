@@ -1,8 +1,8 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.5 · 2026-10-10 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.5.1 · 2026-10-10 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
-Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log). v0.4 adds what TM-11, TM-19 and TM-20 change: a collection refuses a file's facet instead of dropping it, a submodule reads as what it pins (`tm:pins`), a page links to itself in the other language and on the other site (`alternate`), and no refusal offers the address it refused. All three went live on 2026-10-10 after the deploy's crawl caught nine faults in the first attempt (a submodule record without its type, a crawler that read a tree at a ref as a file, a front page whose other language went unanswered); the spec records the fixed behaviour. v0.5 adds the last two tickets of the work package: the root and the connect instructions name the box's orientation documents (TM-12), and the first application is built on the platform, the `entity` mount (TM-16), with ten relations of its own. §11 says what building it asked of the layers under it. Both are built and tested in the reference server and wait on its next deploy; their markers read `[planned: TM-n, built, awaiting deploy]` until the live server does it.
+Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log). v0.4 adds what TM-11, TM-19 and TM-20 change: a collection refuses a file's facet instead of dropping it, a submodule reads as what it pins (`tm:pins`), a page links to itself in the other language and on the other site (`alternate`), and no refusal offers the address it refused. All three went live on 2026-10-10 after the deploy's crawl caught nine faults in the first attempt (a submodule record without its type, a crawler that read a tree at a ref as a file, a front page whose other language went unanswered); the spec records the fixed behaviour. v0.5 adds the last two tickets of the work package: the root and the connect instructions name the box's orientation documents (TM-12), and the first application is built on the platform, the `entity` mount (TM-16), with ten relations of its own. §11 says what building it asked of the layers under it. Both went live on 2026-10-10 and were re-checked from outside on the live server, where the deploy's crawl read 3,189 URIs clean.
 
 Conformance markers used throughout:
 
@@ -47,7 +47,7 @@ The stack is five layers. Each depends only on the one below it, and each has a 
 | 2 Addressing | The URI grammar and templates | Any thing on the box has a URI; adding a mount doesn't change the grammar | [shipped]: `fs`, `git`, `http` and `offbox` all fit one shape (`offbox` was added in TM-7 without a grammar change). `entity` fits it too (TM-16, §11) |
 | 3 Resolver | What is behind a URI; errors; facets | Every URI returns content plus typed links, with no grammar change | [shipped]: TM-11, TM-19, TM-20 live since 2026-10-10. TM-16 found one gap here: a mount had no way to answer for a link another mount starts (§11) |
 | 4 Link vocabulary | The closed set of relations | A client can traverse knowing only rel names; a new rel is a vocabulary change, not a resolver change | [shipped]: TM-7, TM-8, TM-14, TM-18. TM-16 added ten rels as table rows and widened two rules (§11) |
-| 5 Applications | Everything semantic | Built without touching layers 1–4 | [planned: TM-16, built, awaiting deploy]: the `entity` mount is the first, and §11 records how the test went |
+| 5 Applications | Everything semantic | Built without touching layers 1–4 | [shipped: TM-16]: the `entity` mount is the first, and §11 records how the test went |
 
 **The platform is layers 1–4.** Its finish line is: *every real thing on the box is addressable and resolvable with typed links.* Everything above is an application, and each application is a test of whether the platform was really finished.
 
@@ -67,11 +67,11 @@ Nothing in layers 1–3 is novel protocol. The original contribution is layer 4:
 | Idea | Canonical pattern | Specified in | Status |
 |---|---|---|---|
 | Everything has a URI | MCP Resources: URI-addressed, read-only, with `mimeType` | MCP spec, resources | [shipped] via `resolve` |
-| Handshake that says what we have | MCP `initialize` + capabilities; `instructions` field as the MOTD | MCP lifecycle | [partial]: the orientation documents are not named yet (TM-12, built, awaiting deploy) |
+| Handshake that says what we have | MCP `initialize` + capabilities; `instructions` field as the MOTD | MCP lifecycle | [shipped: TM-12] |
 | Generate a URI from rules | MCP Resource Templates, RFC 6570 | MCP spec; RFC 6570 | [shipped] |
 | A safe `ls` | `resources/list` with cursor pagination | MCP pagination | [shipped] |
 | Resolve into content | `resources/read`: text or blob + `mimeType` | MCP spec | [shipped] via `resolve` |
-| Back-and-forth negotiation | `completion/complete` on template arguments | MCP completions | [shipped]: `repo`, `site`, `path`, `as`, `at` and `n` complete from live values (TM-17 was filed against a client that never calls it). An entity's `kind`, `key` and `routine` complete too [planned: TM-16, built, awaiting deploy] |
+| Back-and-forth negotiation | `completion/complete` on template arguments | MCP completions | [shipped]: `repo`, `site`, `path`, `as`, `at` and `n` complete from live values (TM-17 was filed against a client that never calls it). An entity's `kind`, `key` and `routine` complete too [shipped: TM-16] |
 | The OS is the namespace | Plan 9 / 9P mounts; MCP Roots | Plan 9; MCP roots | [shipped] |
 | Page ↔ source ↔ history joins | HATEOAS; typed `rel` links | RFC 8288 | [shipped] |
 | Facets | Representation in query params, never path suffixes | RFC 3986 | [shipped] |
@@ -95,7 +95,7 @@ The server speaks both: MCP **resources** (`resources/list`, `resources/template
 
 The namespace is unchanged by the shim: `resolve` is a transport convenience over layers 2–3, not a different protocol.
 
-**Orientation.** The server sends `instructions` at `initialize` describing the mounts, the links and how to begin [shipped]. A box also has documents of its own that a newcomer should read first, and a fresh session should not have to find them by walking. So the root resource carries them twice: in its body as `start_here`, a list of `{uri, what}`, and as `help` links (§9). The `instructions` end by naming the same URIs, taken from the same list, so the two cannot disagree. A document is named only when it resolves: one whose repository the server does not mount, or that is not at its HEAD, is left out, because a pointer that does not resolve is worse than none. The list is kept to two or three. On `tinymachines` it is `git/public/START-HERE.md`, `git/public/CLAUDE.md` and `git/6502/CLAUDE.md`. [planned: TM-12, built, awaiting deploy]
+**Orientation.** The server sends `instructions` at `initialize` describing the mounts, the links and how to begin [shipped]. A box also has documents of its own that a newcomer should read first, and a fresh session should not have to find them by walking. So the root resource carries them twice: in its body as `start_here`, a list of `{uri, what}`, and as `help` links (§9). The `instructions` end by naming the same URIs, taken from the same list, so the two cannot disagree. A document is named only when it resolves: one whose repository the server does not mount, or that is not at its HEAD, is left out, because a pointer that does not resolve is worse than none. The list is kept to two or three. On `tinymachines` it is `git/public/START-HERE.md`, `git/public/CLAUDE.md` and `git/6502/CLAUDE.md`. [shipped: TM-12]
 
 ---
 
@@ -126,7 +126,7 @@ tm://{host}/offbox/{name}
 
 These are the templates the live server publishes. It also accepts `as` and `range` on `fs`, `range` on `git`, and `cursor` on any collection, which the templates do not name. [shipped]
 
-The entity mount brings two more [planned: TM-16, built, awaiting deploy]:
+The entity mount brings two more [shipped: TM-16]:
 
 ```
 tm://{host}/entity/{kind}/{key}{?as}
@@ -141,7 +141,7 @@ tm://{host}/entity/game/{key}/routine/{routine}{?as}
 | `git/` | `2a03`, `2c02`, `6502`, `halfphi`, `nes`, `nes-bench`, `nes-bus`, `ntsc-crt`, `public`, `tinypeek` |
 | `http/` | `tinymachines.ai`, `beta.tinymachines.ai`; both serve an `/ja` locale |
 | `offbox/` | Where a build chain leaves the box: `autopsy-models`, `cartridges`. Named and described, never served (§8) |
-| `entity/` | The autopsy's patterns, games, routines and lessons (§11) [planned: TM-16, built, awaiting deploy] |
+| `entity/` | The autopsy's patterns, games, routines and lessons (§11) [shipped: TM-16] |
 
 The fourth mount arrived without a grammar change, which is the layer-2 test from §2 passing in practice. So did the fifth.
 
@@ -154,7 +154,7 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 | `text` | http | Readable extraction of the rendered page's main element. **Default for an http page.** Something that is not a page (robots.txt, a picture) reads as itself with no facet | [shipped]: TM-4 |
 | `rendered` | http | The HTML a visitor gets | [shipped] |
 | `raw` | fs, git | Bytes with the backend mimeType; base64 `blob` for binary. The default for fs and git files; `resolve` returns the blob only when `as=raw` is asked for | [shipped]: TM-2 |
-| `stat` | fs, git, http, offbox, entity | Metadata plus links, no content. For http: status, contentType and size, fetched without following a redirect. It is the one facet an entity offers | [shipped]; on entity [planned: TM-16, built, awaiting deploy] |
+| `stat` | fs, git, http, offbox, entity | Metadata plus links, no content. For http: status, contentType and size, fetched without following a redirect. It is the one facet an entity offers | [shipped]; on entity since TM-16 |
 | `log` | git | Commits touching the path | [shipped] |
 | `blame` | git | Line attribution | [shipped] |
 | `tree` | git | The listing of a tree, one level, paged; the default for a git collection | [partial]: recursive and depth-capped is not built |
@@ -239,16 +239,16 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | rel | From → To | Meaning | Status |
 |---|---|---|---|
 | `tm:source` / `tm:renders-as` | page ↔ route source or cartridge | What emitted this page; inverse | [shipped] — incl. lesson page ↔ `prg.s`, `chr.s`, `lesson.json`, `three.txt` |
-| `tm:source` / `tm:renders-as` | page ↔ the entity it is about | A game's page and the game. The pair is widened here from what emitted a page to what a page is of (§11) | [planned: TM-16, built, awaiting deploy] |
+| `tm:source` / `tm:renders-as` | page ↔ the entity it is about | A game's page and the game. The pair is widened here from what emitted a page to what a page is of (§11) | [shipped: TM-16] |
 | `tm:generated-by` / `tm:generates` | output ↔ generator; pulled copy ↔ its origin | The computation whose output this is, or the file a build copied in | [shipped]: TM-7 |
 | `tm:input` / `tm:input-of` | generator ↔ what it reads | What a script reads that it did not make (an `offbox` node on `tinymachines`) | [shipped]: TM-7 |
 | `tm:data` / `tm:read-by` | page or collection ↔ dataset | Data the page's own code reads at render time, the shared frame's excluded; a record names each route that reads it once (its page, or the collection a dynamic route's pages are listed in, which carries the `tm:data` back) | [shipped]: TM-8, TM-14, TM-18 |
-| `tm:data` / `tm:read-by` | entity ↔ the record it is read from | An entity's `href` ends in a JSON pointer to its place in the record (`#/games/8`). The record answers once for each kind, with a link to that kind's collection, which carries the `tm:data` back | [planned: TM-16, built, awaiting deploy] |
-| `tm:found-in` / `tm:exhibits` | pattern ↔ game | A pattern and each game a rule found it in. The `title` says how many times | [planned: TM-16, built, awaiting deploy] |
-| `tm:instance` / `tm:instance-of` | pattern ↔ routine | A pattern and each routine a rule named with it | [planned: TM-16, built, awaiting deploy] |
-| `tm:demonstrated-by` / `tm:demonstrates` | pattern ↔ lesson | A pattern and each lesson whose cartridge uses it | [planned: TM-16, built, awaiting deploy] |
-| `tm:measures` / `tm:measured-by` | lesson ↔ game | A lesson and the game it was measured beside. `inferred`: joined by the game's name (§11) | [planned: TM-16, built, awaiting deploy] |
-| `tm:cartridge` / `tm:cartridge-of` | lesson ↔ its directory in git | A lesson and its cartridge's source | [planned: TM-16, built, awaiting deploy] |
+| `tm:data` / `tm:read-by` | entity ↔ the record it is read from | An entity's `href` ends in a JSON pointer to its place in the record (`#/games/8`). The record answers once for each kind, with a link to that kind's collection, which carries the `tm:data` back | [shipped: TM-16] |
+| `tm:found-in` / `tm:exhibits` | pattern ↔ game | A pattern and each game a rule found it in. The `title` says how many times | [shipped: TM-16] |
+| `tm:instance` / `tm:instance-of` | pattern ↔ routine | A pattern and each routine a rule named with it | [shipped: TM-16] |
+| `tm:demonstrated-by` / `tm:demonstrates` | pattern ↔ lesson | A pattern and each lesson whose cartridge uses it | [shipped: TM-16] |
+| `tm:measures` / `tm:measured-by` | lesson ↔ game | A lesson and the game it was measured beside. `inferred`: joined by the game's name (§11) | [shipped: TM-16] |
+| `tm:cartridge` / `tm:cartridge-of` | lesson ↔ its directory in git | A lesson and its cartridge's source | [shipped: TM-16] |
 | `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
 | `tm:pins` | submodule → repository at the pinned commit | The repository and commit a submodule names. Unpaired: a repository does not list everything that embeds it | [shipped: TM-19] |
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
@@ -258,16 +258,16 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | `up` (IANA) | any → parent | One level up; a mount root's `up` is `tm://<host>/` | [shipped] |
 | `collection` (IANA) | leaf → its listing | Siblings | [shipped] |
 | `describedby` (IANA) | any → `?as=stat` | Metadata | [shipped] |
-| `help` (IANA) | the root → an orientation document | What to read first on this box (§4). Unpaired: a document does not know it was recommended | [planned: TM-12, built, awaiting deploy] |
+| `help` (IANA) | the root → an orientation document | What to read first on this box (§4). Unpaired: a document does not know it was recommended | [shipped: TM-12] |
 
 Rules:
 
 - Links are typed, never free text. A client ignores rels it doesn't know.
 - Inverse pairs are both emitted, and a cross-version `alternate` is answered by one back. `tm:read-by` is the one bounded exception: a page on another site or in another locale is answered by the one link that stands for its route.
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
-- `href` is always a complete `tm://` URI. It may end in a fragment, which names a place inside the thing and is not part of its identity: an entity's `tm:data` carries a JSON pointer (RFC 6901) into its record. The server reads the URI and ignores the fragment, so the pointer says where to look and does not fetch it [planned: TM-16, built, awaiting deploy].
+- `href` is always a complete `tm://` URI. It may end in a fragment, which names a place inside the thing and is not part of its identity: an entity's `tm:data` carries a JSON pointer (RFC 6901) into its record. The server reads the URI and ignores the fragment, so the pointer says where to look and does not fetch it [shipped: TM-16].
 - A collection is a URI whose path ends in `/`, whatever query follows it: `git/<repo>/?at=<commit>` is a tree, and a client wanting metadata reads it as it is, not with `?as=stat` added (TM-11 refuses that).
-- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned]. The entity mount makes that paging matter more: a pattern links to every routine it names, and on `tinymachines` the largest, `sprite-writer`, carries 309 links (261 of them `tm:instance`) in one read of about 63 KB. That is under the byte cap and it is the largest link set on the server [planned: TM-16, built, awaiting deploy].
+- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned]. The entity mount makes that paging matter more: a pattern links to every routine it names, and on `tinymachines` the largest, `sprite-writer`, carries 309 links (261 of them `tm:instance`) in one read of about 63 KB. That is under the byte cap and it is the largest link set on the server [shipped: TM-16].
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
 
@@ -299,7 +299,7 @@ Read-only removes write risk, not disclosure or availability risk.
 
 ---
 
-## 11. Layer 5: the entity mount [planned: TM-16, built, awaiting deploy]
+## 11. Layer 5: the entity mount [shipped: TM-16]
 
 The first application on the platform, and the test of whether layers 1–4 are done. If it can be built without changing them, they are. This section says what the mount is and then how the test went.
 
@@ -371,7 +371,7 @@ So the platform was close and not finished. The grammar and the transport held w
 - **A link with a number on it.** `tm:found-in` wants a count, and a link has no field for one; the count rides in `title` and in the body. If a second relation wants a number, the link shape should grow one instead.
 - **Multi-host.** One server per box, or one fronting several? The grammar allows both.
 - **Subscriptions.** `resources/subscribe` for change notification. Defer until a use appears.
-- **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 2,300 URIs a run. With the entity mount it is about 3,200, it holds the five entity pairs to the same confidence at both ends, and a run whose budget ends with URIs still queued fails instead of passing on what it reached [planned: TM-16, built, awaiting deploy].
+- **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 3,200 URIs a run with the entity mount (2,300 before it). It holds the five entity pairs to the same confidence at both ends, and a run whose budget ends with URIs still queued fails instead of passing on what it reached [shipped: TM-16].
 
 v2, deliberately excluded:
 

@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.5. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.5.1. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -89,11 +89,10 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 
 | | |
 |---|---|
-| TM-12 | The root resource (`start_here`, `help` links) and the connect instructions name the orientation documents that resolve. Built and tested in `public`, waiting on a deploy. After it, re-check live and move the spec's markers from `[planned: TM-12, built, awaiting deploy]` to shipped |
-| TM-16 | The `entity` mount over `data/autopsy.json` and `data/lessons.json` (the `Entities` class in `api/tm.py`). Built and tested in `public`, waiting on a deploy; then re-check live and move its markers the same way. Spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
+| TM-12, TM-16 | Live since 2026-10-10 (`public` `b2c4cec`), checked from outside and marked shipped in the spec. The entity mount is the `Entities` class in `api/tm.py`; spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
 | **A lesson's game** | `lessons.json` keeps the name of the game a lesson was measured beside, not its key, so `tm:measures` is inferred and joins 5 of 25 lessons. A key in the record would make it exact. The record's writer is `scripts/board-lessons.py`, which is the website session's file: ask, do not edit |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
-| everything else | Live, and marked so in the spec (TM-11, 19 and 20 since 2026-10-10) |
+| everything else | Live, and marked so in the spec. The work package is finished |
 
 Also open in the spec: paging a large link set behind `?as=links&cursor=`
 (a pattern entity now carries up to 309 links in one read); a count has no
