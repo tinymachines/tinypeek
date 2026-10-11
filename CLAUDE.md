@@ -94,11 +94,13 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec. The work package is finished |
 
-Also open in the spec:
-the git `tree` facet is one level, not recursive; tokens, a rate limit and
-an audit log are planned and not built (the live server is anonymous and
-serves only what is already public). A page's text has no size cap while its
-HTML does; nothing live is near it.
+Open in the spec, each with an issue in this repository (filed 2026-10-10,
+none yet approved to build): the git `tree` facet is one level, not
+recursive (#4); tokens (#5), a rate limit (#6) and an audit log (#7) are
+planned and not built, since the live server is anonymous and serves only
+what is already public; a page's text has no size cap while its HTML does,
+and nothing live is near it (#8). Three open questions: a build-emitted
+link manifest (#9), one server or several hosts (#10), subscriptions (#11).
 
 ## Traps already paid for
 
