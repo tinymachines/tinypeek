@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.13.1. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.14. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -99,9 +99,10 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec. The work package is finished |
 
-Open in the spec, each with an issue in this repository (filed 2026-10-10,
-none yet approved to build): tokens (#5) are planned and not built,
-since the live server is anonymous and serves only what is already public. No open questions are left.
+Nothing is open in the spec. Tokens (#5) stay planned and unbuilt by the
+owner's decision on 2026-10-11: nothing served needs one, and when they come
+anonymous reads of public things stay; spec section 10 has the rules a build
+must keep. A non-public mount or a second client would schedule it.
 Settled on 2026-10-11 (#9): no build-emitted link manifest; spec section 8
 has the counts and what would reopen it, which is a second site.
 Settled on 2026-10-11 (#10): a server answers for a set of hosts and one is
