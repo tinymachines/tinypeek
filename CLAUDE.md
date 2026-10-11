@@ -39,9 +39,11 @@ The namespace's code there, which this project now owns:
 | `api/README.md` | the tm section of the API's readme |
 | `docs/mcp-setup-guide.md`, `docs/ja/mcp-setup-guide.md` | the setup guide, a public notebook page in two languages |
 
-**Another session, `public-9b`, works in `../public` on the website.** It
+**Another session works in `../public` on the website.** Its name starts
+with `public-` and changes when it restarts (`public-9b`, then `public-a1`),
+so look it up with ListAgents before you message it. It
 stays out of the files above and you stay out of everything else there. If
-a change needs both sides, message it first (SendMessage to `public-9b`).
+a change needs both sides, message it first.
 
 ## How a change flows
 
@@ -60,7 +62,7 @@ a change needs both sides, message it first (SendMessage to `public-9b`).
 4. **Deploying `../public` is the owner's word, typed in your session**, never
    relayed by another session. Its `CLAUDE.md` and `notes/handoff-2026-10-09.md`
    have the procedure. Two other sessions deploy that box as well: message
-   `public-9b` and `port-bradley-tinymachines-style` before a deploy and
+   the website session and `port-bradley-tinymachines-style` before a deploy and
    again after it. The first to start goes; the other waits.
 
 **Pull before you edit here.** More than one session has pushed to this
