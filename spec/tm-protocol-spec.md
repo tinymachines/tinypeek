@@ -1,8 +1,8 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.5.1 · 2026-10-10 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.6 · 2026-10-10 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
-Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log). v0.4 adds what TM-11, TM-19 and TM-20 change: a collection refuses a file's facet instead of dropping it, a submodule reads as what it pins (`tm:pins`), a page links to itself in the other language and on the other site (`alternate`), and no refusal offers the address it refused. All three went live on 2026-10-10 after the deploy's crawl caught nine faults in the first attempt (a submodule record without its type, a crawler that read a tree at a ref as a file, a front page whose other language went unanswered); the spec records the fixed behaviour. v0.5 adds the last two tickets of the work package: the root and the connect instructions name the box's orientation documents (TM-12), and the first application is built on the platform, the `entity` mount (TM-16), with ten relations of its own. §11 says what building it asked of the layers under it. Both went live on 2026-10-10 and were re-checked from outside on the live server, where the deploy's crawl read 3,189 URIs clean.
+Supersedes v0.2 (2026-10-08) and v0.1 (2026-10-06). v0.2 brought the spec in line with the server that shipped on `tinymachines`, added the layer model and its "done" criteria, and marked every section with its conformance status. v0.3 (TM-13) re-checks every marker against the running server after TM-4, 5, 7, 8, 9, 14 and 18 shipped, adds the `offbox` mount and the `tm:input` pair, and marks as planned the controls v0.2 had called shipped but the server does not have (tokens, rate limits, an audit log). v0.4 adds what TM-11, TM-19 and TM-20 change: a collection refuses a file's facet instead of dropping it, a submodule reads as what it pins (`tm:pins`), a page links to itself in the other language and on the other site (`alternate`), and no refusal offers the address it refused. All three went live on 2026-10-10 after the deploy's crawl caught nine faults in the first attempt (a submodule record without its type, a crawler that read a tree at a ref as a file, a front page whose other language went unanswered); the spec records the fixed behaviour. v0.5 adds the last two tickets of the work package: the root and the connect instructions name the box's orientation documents (TM-12), and the first application is built on the platform, the `entity` mount (TM-16), with ten relations of its own. §11 says what building it asked of the layers under it. Both went live on 2026-10-10 and were re-checked from outside on the live server, where the deploy's crawl read 3,189 URIs clean. v0.6 takes up three of the findings §11 left open: a link may carry a `count` (tinypeek#3), and no read carries more than a hundred links, the rest being behind `?as=links` a page at a time, in one stated order (tinypeek#2). A lesson's record now keeps its game's key, so the lesson-to-game link is exact for all 25 (public#7). All three are built and tested in the reference server and wait on its next deploy; their markers say so.
 
 Conformance markers used throughout:
 
@@ -155,6 +155,7 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 | `rendered` | http | The HTML a visitor gets | [shipped] |
 | `raw` | fs, git | Bytes with the backend mimeType; base64 `blob` for binary. The default for fs and git files; `resolve` returns the blob only when `as=raw` is asked for | [shipped]: TM-2 |
 | `stat` | fs, git, http, offbox, entity | Metadata plus links, no content. For http: status, contentType and size, fetched without following a redirect. It is the one facet an entity offers | [shipped]; on entity since TM-16 |
+| `links` | every mount | A thing's links and no content, a page at a time (§9). The body is `{uri, total, returned, nextCursor?}`; the links ride where links always ride. `cursor=` continues, and here it is the links' cursor even on a collection | [planned: tinypeek#2, built, awaiting deploy] |
 | `log` | git | Commits touching the path | [shipped] |
 | `blame` | git | Line attribution | [shipped] |
 | `tree` | git | The listing of a tree, one level, paged; the default for a git collection | [partial]: recursive and depth-capped is not built |
@@ -200,6 +201,7 @@ A mount is any backend that implements three operations and one optional one. Ad
 | `read(path, facet)` | Leaf + facets | Content + `mimeType` + `links` | yes |
 | `complete(arg, prefix)` | Template argument + prefix | Up to 100 values, `hasMore` | yes [shipped] |
 | `links(path)` | Any path | The `links` array without content (`?as=stat`) | optional [shipped] |
+| paging of links | Any path | Not a mount's job: the namespace orders, caps and pages every mount's links itself (`?as=links`, §9), so a mount returns its whole set and the rule lives in one place | [planned: tinypeek#2, built, awaiting deploy] |
 
 A git submodule is neither a tree nor a file of the repository that holds it: its commit lives in another repository. It reads as a record, `{mimeType, type: "submodule", path, at, commit, pinned, url, repository}`, where `mimeType` is `application/json` (what its listing claims), `pinned` is the commit it pins, `url` comes from `.gitmodules` at that ref, and `repository` is the namespace URI of the pinned commit when the server also mounts that repository and its copy has that commit (else `null`: a link that would not resolve is worse than none). It links `tm:pins` there, and `?as=log` is the commits that moved the pin. It offers `stat` and `log`; `blame` is refused. [shipped: TM-19]
 
@@ -234,7 +236,9 @@ tm://tinymachines/offbox/autopsy-models
 
 ## 9. Link vocabulary
 
-Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 semantics. IANA relations are reused where they exist; the rest are namespaced `tm:`.
+Every response carries `links`: `{rel, href, confidence, title?, count?}`, RFC 8288 semantics. IANA relations are reused where they exist; the rest are namespaced `tm:`.
+
+**`count`.** A link usually stands for one thing. Where it stands for several occurrences (a pattern found 41 times in a game), it may carry `count`: a whole number, zero or more, on any rel. It is a number a client can sort and filter on; `title` goes on saying it for a person. A pair that counts says the same number from both ends. It is one optional field on the link, defined here once, and not a new rel and not an RFC 8288 target attribute: those are strings a client would have to parse, which is the thing the field is for avoiding. On `tinymachines` the links that carry it are `tm:found-in` / `tm:exhibits` and `tm:demonstrated-by` / `tm:demonstrates` (how many times a rule found the pattern there, the record's own count) and `tm:links` (how many links the set holds). [planned: tinypeek#3, built, awaiting deploy]
 
 | rel | From → To | Meaning | Status |
 |---|---|---|---|
@@ -247,7 +251,7 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | `tm:found-in` / `tm:exhibits` | pattern ↔ game | A pattern and each game a rule found it in. The `title` says how many times | [shipped: TM-16] |
 | `tm:instance` / `tm:instance-of` | pattern ↔ routine | A pattern and each routine a rule named with it | [shipped: TM-16] |
 | `tm:demonstrated-by` / `tm:demonstrates` | pattern ↔ lesson | A pattern and each lesson whose cartridge uses it | [shipped: TM-16] |
-| `tm:measures` / `tm:measured-by` | lesson ↔ game | A lesson and the game it was measured beside. `inferred`: joined by the game's name (§11) | [shipped: TM-16] |
+| `tm:measures` / `tm:measured-by` | lesson ↔ game | A lesson and the game it was measured beside. Live it is `inferred`, joined by the game's name [shipped: TM-16]; with the game's key in the record it is `exact` (§11) | [planned: public#7, built, awaiting deploy] |
 | `tm:cartridge` / `tm:cartridge-of` | lesson ↔ its directory in git | A lesson and its cartridge's source | [shipped: TM-16] |
 | `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
 | `tm:pins` | submodule → repository at the pinned commit | The repository and commit a submodule names. Unpaired: a repository does not list everything that embeds it | [shipped: TM-19] |
@@ -258,6 +262,8 @@ Every response carries `links`: `{rel, href, confidence, title?}`, RFC 8288 sema
 | `up` (IANA) | any → parent | One level up; a mount root's `up` is `tm://<host>/` | [shipped] |
 | `collection` (IANA) | leaf → its listing | Siblings | [shipped] |
 | `describedby` (IANA) | any → `?as=stat` | Metadata | [shipped] |
+| `tm:links` | a read over the cap → `?as=links` | The thing's whole link set, paged. Its `count` is how many links there are. Always the last link of the read that carries it. Unpaired | [planned: tinypeek#2, built, awaiting deploy] |
+| `next` (IANA) | a page of `?as=links` → the page after | The last link of every page but the last | [planned: tinypeek#2, built, awaiting deploy] |
 | `help` (IANA) | the root → an orientation document | What to read first on this box (§4). Unpaired: a document does not know it was recommended | [shipped: TM-12] |
 
 Rules:
@@ -267,7 +273,9 @@ Rules:
 - `confidence` is mandatory on `tm:` rels and omitted on IANA rels.
 - `href` is always a complete `tm://` URI. It may end in a fragment, which names a place inside the thing and is not part of its identity: an entity's `tm:data` carries a JSON pointer (RFC 6901) into its record. The server reads the URI and ignores the fragment, so the pointer says where to look and does not fetch it [shipped: TM-16].
 - A collection is a URI whose path ends in `/`, whatever query follows it: `git/<repo>/?at=<commit>` is a tree, and a client wanting metadata reads it as it is, not with `?as=stat` added (TM-11 refuses that).
-- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33), and paging larger sets behind `?as=links&cursor=` is [planned]. The entity mount makes that paging matter more: a pattern links to every routine it names, and on `tinymachines` the largest, `sprite-writer`, carries 309 links (261 of them `tm:instance`) in one read of about 63 KB. That is under the byte cap and it is the largest link set on the server [shipped: TM-16].
+- **Fan-out is bounded.** One link per route on the canonical site and locale; dynamic routes collapse to their collection (a dynamic route whose pages share only the root is named page by page, since the root is the front page too); other sites and locales are reached through `alternate`, which is why those links are never capped (TM-20). `autopsy.json` carries 5 `tm:read-by` [shipped: TM-18]. A record most routes read still carries one a route (`projects.json`: 33). What is left after that is bounded by paging, below.
+- **Links come in one order.** On every mount: the IANA relations first (they are how a client moves), then `exact`, then `inferred`, then `low`; within each by `rel`, then by `href`. The order is stated so that a page of a large set is the same page on the next read. A body may keep an order of its own where one matters (the root's `start_here` is a reading order). [planned: tinypeek#2, built, awaiting deploy]
+- **No read carries more than 100 links.** A set over the cap is cut to its first 99 in that order, and the read's last link is `tm:links` to `<uri>?as=links`, so nothing becomes unreachable. `?as=links` returns the whole set and no content, 99 a page, each page but the last ending in `next`; its body says `total`. Walking it yields every link exactly once. A git `at=` stays on the way there, since a ref is part of what the thing is; no other facet does. The set is the thing's own links: its `?as=stat` also points back at it with an `alternate`, which is the stat's link and is not counted or paged. Because the set is taken from the stat, a file over the byte cap and a page that would have to be fetched whole still give up their links. The rule is the namespace's and not any mount's. On `tinymachines` five things are over the cap today: the route file that renders every notebook page (349 links), three patterns (`sprite-writer` 309, `bank-switch` 200, `position-compare` 116) and the route file of the lessons (105). v0.5 called `sprite-writer` the largest set on the server; the crawler, once it counted, found the notebook's route file larger. [planned: tinypeek#2, built, awaiting deploy]
 
 Illustrative example (paths abbreviated; check exact hrefs against the live server) — `tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump?as=stat`:
 
@@ -334,12 +342,14 @@ Identity is the stable key already in the data, not a file path, so it survives 
 | lesson | `tm:demonstrates` | pattern | exact |
 | game | `tm:renders-as` | its `/autopsy/games/{key}` page, in each locale and on each site that has it; the page links `tm:source` back | exact |
 | lesson | `tm:cartridge` | `git/public/lessons/{key}/`, where that directory is tracked; it links `tm:cartridge-of` back | exact |
-| lesson | `tm:measures` | game; the game links `tm:measured-by` back | inferred |
+| lesson | `tm:measures` | game; the game links `tm:measured-by` back | exact by key; inferred by name |
 | any entity | `tm:data` | the JSON record, a JSON pointer in the fragment | exact |
 
 Every pair is answered from the other end, and the crawler holds each to the same confidence both ways.
 
-**A lesson and its game are joined by name, and mostly are not joined.** A lesson's record keeps the name of the game it was measured beside ("The Legend of Zelda"), not that game's key. The mount links the two only when exactly one game in the record has that name, once a region or revision in brackets is set aside and a trailing article is moved back to the front. That is a reading of names, so the link is `inferred`. On `tinymachines` it joins the 5 lessons measured beside The Legend of Zelda. The other 20 were measured beside Super Mario Bros., and the cartridge the record holds is "Super Mario Bros. + Duck Hunt": a different name and perhaps a different program, so no link is made. The lesson's body still says which game. A key in the lesson's record would make all 25 exact; that is a change to the record's writer, outside the namespace.
+**A lesson and its game are joined by the key the record keeps.** A lesson's record says which game it was measured beside as `against.game`, a name, and `against.key`, that game's key. The mount follows the key, and the link is `exact`. On `tinymachines` all 25 lessons carry one: 20 name the cartridge that holds Super Mario Bros. and 5 name The Legend of Zelda. The record's writer refuses a key that is not a game in the autopsy's record, and the keys were checked against the dumps the measuring runs load, not assumed from the names. [planned: public#7, built, awaiting deploy]
+
+A record with only the name is still read, by the rule the mount shipped with: the two are linked when exactly one game has that name, once a region or revision in brackets is set aside and a trailing article is moved back to the front, and that link is `inferred`. That rule joined 5 of the 25 and is what the live server does until the deploy. A key that names no game is not followed, and the name is not tried in its place: a refusal beats a plausible answer.
 
 **Refusals teach, as elsewhere.** A wrong key answers with the nearest keys; a game asked for by its name is offered by its key; a kind or a collection spelled without its slash is offered with it. A collection refuses `?as=stat` (TM-11).
 
@@ -357,7 +367,8 @@ The claim under test was that layers 1–4 were finished. The mount needed these
 | 3 Resolver | `stat` extended to a fifth mount, by the same rule the other four follow | Done |
 | 4 Vocabulary | Ten rels, added as table rows (§9). No change to the link's shape | Done, as the layer promises |
 | 4 Vocabulary | **Two rules widened.** `tm:read-by`'s bounded exception was written for pages: a record names each route once. It now reads "each reader once", where a reader is a route or a kind of entity, or `autopsy.json` would carry 764 links back, one for each pattern, game and routine. And `tm:source` / `tm:renders-as` meant what emitted a page; a game's page and the game use it for what a page is of | Was not done: both rules were written around the one application that existed |
-| 4 Vocabulary | A count had nowhere to go on a link, and went into `title` and the body (§12) | Open |
+| 4 Vocabulary | A count had nowhere to go on a link, and went into `title` and the body | Was not done. The link gained one optional field, `count` (§9), on purpose: the vocabulary changed its shape once, and not by a new rel [planned: tinypeek#3, built, awaiting deploy] |
+| 3 Resolver | A pattern's read carried 309 links, and the planned paging did not exist | Was not done. The namespace now orders, caps and pages links for every mount (§9); no mount changed to get it [planned: tinypeek#2, built, awaiting deploy] |
 | 4 Vocabulary | An `href` may now carry a fragment, which a client comparing identities must drop | A rule added (§9) |
 
 So the platform was close and not finished. The grammar and the transport held without a change. The resolver lacked a way for mounts to answer each other, and two vocabulary rules had the first application's shape baked in. A second application is the next test of whether those are now general.
@@ -367,11 +378,9 @@ So the platform was close and not finished. The grammar and the transport held w
 ## 12. Open questions and v2
 
 - **Manifest schema.** `tinymachines` settled for a small hand-kept `lineage.json` checked by a test, plus what records and the build already say (§8). Whether a framework-emitted `tm-links.json` is worth having is open.
-- **A lesson's game.** A lesson record names the game it was measured beside and does not carry its key, so `tm:measures` is `inferred` and often absent (§11). Whether the record should carry the key is the record's owner's call.
-- **A link with a number on it.** `tm:found-in` wants a count, and a link has no field for one; the count rides in `title` and in the body. If a second relation wants a number, the link shape should grow one instead.
 - **Multi-host.** One server per box, or one fronting several? The grammar allows both.
 - **Subscriptions.** `resources/subscribe` for change notification. Defer until a use appears.
-- **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 3,200 URIs a run with the entity mount (2,300 before it). It holds the five entity pairs to the same confidence at both ends, and a run whose budget ends with URIs still queued fails instead of passing on what it reached [shipped: TM-16].
+- **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 3,200 URIs a run with the entity mount (2,300 before it). It holds the five entity pairs to the same confidence and the same `count` at both ends. It fails a read over the link cap, and walks `?as=links` wherever a read points there (every link once, as many as it said), so an inverse on a later page still counts [planned: tinypeek#2, built, awaiting deploy]. And a run whose budget ends with URIs still queued fails instead of passing on what it reached [shipped: TM-16].
 
 v2, deliberately excluded:
 
