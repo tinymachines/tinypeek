@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.14. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.14.1. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -81,35 +81,33 @@ Rebase onto theirs, keep both sides' substance, and say what you kept.
   has em dashes the owner wrote; leave them unless the owner asks.
 - Plain, warm sentences. Say what is not covered.
 
-## What is left
+## State of the work
 
-The owner's work package (a black-box audit of the namespace, TM-1 to
-TM-20) lives in the owner's docs folder beside these repositories, under
-`feedback/`. It is not in either repository. Its state on 2026-10-11:
+Nothing is left open. The owner's work package (a black-box audit of the
+namespace, TM-1 to TM-20) is finished and live; it lives in the owner's docs
+folder beside these repositories, under `feedback/`, and is in neither
+repository. Every issue filed here from the spec's open items is closed. The
+spec's version history says what each version changed and when it went live.
+
+What a session picking this up should know that the spec does not say:
 
 | | |
 |---|---|
-| TM-12, TM-16 | Live since 2026-10-10 (`public` `b2c4cec`), checked from outside and marked shipped in the spec. The entity mount is the `Entities` class in `api/tm.py`; spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
-| tinypeek#2, #3, public#7 | Live since 2026-10-10 (`public` `7faca76`), checked from outside and marked shipped: a link may carry `count`; no read carries more than 100 links and the rest is behind `?as=links` in one stated order; `tm:measures` is exact for all 25 lessons by `against.key` |
-| tinypeek#8 | Live since 2026-10-10 (`public` `64c7c1f`), marked shipped: a page's text is held to the byte cap and reads in ranges. No live page is over the cap, so the refusal is held by the tests |
-| tinypeek#4 | Live since 2026-10-10 (`public` `745937b`), checked from outside and marked shipped: a git tree reads to a stated depth, and a listing at a ref names its children at that ref |
-| tinypeek#6 | Live since 2026-10-10 (`public` `b84f8b0`), checked from outside and marked shipped: a rate limit by caller in the transport (`RateLimit` in `api/mcp_server.py`; `api/app.py` passes the caller). Sessions on the box share one address, so a crawl over HTTP from any of them draws on one bucket; the crawler runs in-process and is not limited |
-| tinypeek#7 | Live since 2026-10-11 (`public` `e0c2c7b`), checked and marked shipped: an audit log of requests (`AuditLog` in `api/mcp_server.py`), with no address, outside the checkout, bounded in days and bytes; and no refusal quotes a host path. The log is in the service's state directory and cannot be read through the namespace, so a live check of it is a look on the box |
-| audit follow-up | Live since 2026-10-11 (`public` `6ec8d89`): a logged URI is cut to 300 characters with its length noted. Known and stated in the spec: a caller inside the rate limit can still fill a day's 8 MiB by volume |
+| Where things are in the code | The entity mount is the `Entities` class in `api/tm.py`, with one resolver hook (`inbound`). The rate limit and the request log are `RateLimit` and `AuditLog` in `api/mcp_server.py`; `api/app.py` passes the caller. `tm://` is `TOP` in `api/tm.py` |
+| Checks that cannot be made from outside | The request log is in the service's state directory and is not served, so checking it is a look on the box. No live page's text is over the byte cap, so that refusal is held by the tests |
+| One bucket for the box | Sessions on the box share one address, so a crawl over HTTP from any of them draws on one rate bucket. The crawler runs in-process and is not limited |
+| Known and stated | A caller inside the rate limit can still fill a day's 8 MiB of the request log by volume |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
-| everything else | Live, and marked so in the spec. The work package is finished |
 
-Nothing is open in the spec. Tokens (#5) stay planned and unbuilt by the
-owner's decision on 2026-10-11: nothing served needs one, and when they come
-anonymous reads of public things stay; spec section 10 has the rules a build
-must keep. A non-public mount or a second client would schedule it.
-Settled on 2026-10-11 (#9): no build-emitted link manifest; spec section 8
-has the counts and what would reopen it, which is a second site.
-Settled on 2026-10-11 (#10): a server answers for a set of hosts and one is
-conformant; `tm://` lists them (`TOP` in `api/tm.py`), live since 2026-10-11
-(`public` `c23b2b3`) and checked from outside. Federation between servers waits for a second box.
-Settled on 2026-10-11 (#11): no subscriptions; a client reads `?as=stat`
-again, and spec section 4 says what each mount gives it to compare.
+Decided and not built, each with its reasons in the spec and what would
+reopen it:
+
+| | |
+|---|---|
+| No link manifest (#9) | Section 8. A second site would reopen it |
+| No subscriptions (#11) | Section 4. A client reads `?as=stat` again. A need to know within seconds, or tokens, would reopen it |
+| Tokens stay planned (#5) | Section 10, the owner's decision on 2026-10-11. A mount that is not public, or a second client, would schedule it; anonymous reads of public things stay |
+| Federation (#10) | Section 5. A server answers for a set of hosts and one is conformant; how two servers find each other waits for a second box |
 
 ## Traps already paid for
 

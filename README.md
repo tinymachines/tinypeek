@@ -16,7 +16,8 @@ tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump
 | Path | What it is |
 |---|---|
 | [`spec/tm-protocol-spec.md`](spec/tm-protocol-spec.md) | The protocol: layers, grammar, facets, errors, mount contract, link vocabulary, safety. Every section is marked shipped, partial or planned. |
-| [`docs/stack-explainer.md`](docs/stack-explainer.md) | The plain-language companion: what MCP gives you, what tinypeek adds, and where each layer stops. |
+| [`docs/stack-explainer.md`](docs/stack-explainer.md) | The plain-language companion: what MCP gives you, what tinypeek adds, and where each layer stops. Its last section is a status snapshot. |
+| [`CLAUDE.md`](CLAUDE.md) | How a change flows between this repository and the server, for whoever works on either. |
 
 ## The idea in one diagram
 
@@ -39,9 +40,13 @@ MCP gives you addresses and a read verb. It doesn't give you a graph between the
 - **Errors teach.** A wrong guess comes back with the nearest URIs that do resolve.
 - **Standards first.** MCP, RFC 3986 / 6570 / 8288, Plan 9.
 
+## Status
+
+Spec v0.14. Everything it describes is live on the reference deployment and checked from outside, and no question in it is open. Three things were decided and not built, each with its reasons in the spec: a build-emitted link manifest, subscriptions, and tokens.
+
 ## Reference deployment
 
-The `tinymachines` server runs the protocol live over its `fs`, `git`, `http` and `offbox` mounts and an `entity` mount, the first application built on them, and serves this repository at `tm://tinymachines/git/tinypeek/`. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
+The `tinymachines` server runs the protocol live over its `fs`, `git`, `http` and `offbox` mounts and an `entity` mount, the first application built on them, and serves this repository at `tm://tinymachines/git/tinypeek/`. The endpoint is `https://tinymachines.ai/api/mcp`, open to any MCP client with no token, and the [setup guide](https://tinymachines.ai/docs/mcp-setup-guide) says how to connect. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
 
 ## License
 

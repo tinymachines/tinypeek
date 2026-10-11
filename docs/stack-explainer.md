@@ -1,6 +1,6 @@
 # The tm:// Stack — What MCP Gives Us, What We Built, and Where to Stop
 
-**Companion to the [tm:// Protocol Spec v0.3](../spec/tm-protocol-spec.md) · 2026-10-09**
+**Companion to the [tm:// Protocol Spec](../spec/tm-protocol-spec.md) · last brought up to date 2026-10-11, for v0.14**
 
 This is the plain-language version. The spec says *what* the protocol is; this says *why it's shaped that way* and how to think about building on it.
 
@@ -73,7 +73,7 @@ You can hand someone the grammar and they can construct an address for something
 
 ### Resolver — done when every URI returns content plus typed links
 
-The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. The http default facet (TM-4) and ranked `nearest` suggestions (TM-5) are done. The one gap left is ticketed: facet errors on collections (TM-11).
+The scheme says what a name looks like; the resolver says what's behind it. Keep that cut clean — resolver logic never leaks into the grammar. The http default facet (TM-4), ranked `nearest` suggestions (TM-5) and facet errors on collections (TM-11) are done.
 
 ### Link vocabulary — done when the set of relations is closed and documented
 
@@ -87,7 +87,7 @@ Patterns, games, routines, graph queries, search, proposals: all of it is a *con
 
 > **Stop at: every real thing on the box is addressable and resolvable with typed links. That's the platform.**
 
-Everything after is an application on the platform, and each one is a test. **The first application that forces a platform change tells you the platform wasn't done.** The entity mount (TM-16) is that first test.
+Everything after is an application on the platform, and each one is a test. **The first application that forces a platform change tells you the platform wasn't done.** The entity mount (TM-16) was that first test. It found the platform close and not finished: one hook was missing in the resolver and two vocabulary rules were too narrow. Both are fixed, and the next application is the next test.
 
 ---
 
@@ -109,7 +109,7 @@ Quick checks to run whenever you add something:
 Because layers 1–4 don't know what they're pointing at, the same stack applies wherever things have identities and relationships. Each of these is a new mount or a new application, not a new protocol:
 
 - **More of the box.** Hosts and hardware (an osquery- or Redfish-backed mount), installed packages (purl identities), running services.
-- **Other boxes.** The grammar already has `host`; the fleet is a set of hosts under one namespace.
+- **Other boxes.** The grammar already has `host`, and a server answers for a set of them, listed at `tm://`. Today the set is one. How two separate servers would find each other is not decided, and waits for a second box.
 - **Code at symbol level.** SCIP/LSIF symbols as addressable entities, linked to the files and pages they appear in.
 - **The entity index.** Per-kind identity (content hashes, SWHID for git objects, canonical URLs for pages) with an `edges(src, rel, dst, confidence, observed_at)` table — the resolver serves live views, the index answers graph queries.
 
@@ -117,13 +117,14 @@ Keep scope honest: each new area is valuable only if it fits the existing layers
 
 ---
 
-## 7. Status snapshot (2026-10-10)
+## 7. Status snapshot (2026-10-11)
 
-- **Fixed and live:** text files served as text (TM-1), binary content through `?as=raw` (TM-2), complete section listings (TM-3), text as an http page's default (TM-4), ranked `nearest` (TM-5), lesson page ↔ cartridge links (TM-6), full lineage with `offbox` (TM-7), exact page data links (TM-8), the deny-list narrowed (TM-9), mount-root `up` (TM-10), exact `read-by` (TM-14), a link crawler on every deploy (TM-15), bounded fan-out (TM-18), and this spec brought up to date (TM-13).
-- **Live since 2026-10-10:** a collection refuses a file's facet instead of dropping it (TM-11); a submodule reads as what it pins instead of looping (TM-19); a page links to itself in the other language and on the other site (TM-20).
-- **Live since 2026-10-10, later the same day:** orientation at connect (TM-12): the root and the connect instructions name the documents to read first. The entity mount (TM-16): patterns, games, routines and lessons with addresses and links of their own.
-- **Live since 2026-10-10 as well:** a link may carry a `count` (tinypeek#3); no read carries more than 100 links, and the rest is behind `?as=links`, a page at a time in one stated order (tinypeek#2); every lesson links to its game exactly, by the key its record keeps (public#7).
-- **What the first application found:** the grammar and the transport held without a change. The resolver needed one hook so a mount can answer for a link another mount starts, and two vocabulary rules had been written around pages and had to be widened. The spec's section 11 has the table.
-- **Not a bug:** completions (TM-17) exist; the auditing client never called them.
+Everything the spec describes is live on `tinymachines`, and nothing in it is open. The spec's version history says what each version changed.
 
-Full detail lives in the work package.
+- **The platform, layers 1 to 4.** Five mounts under one grammar (`fs`, `git`, `http`, `offbox`, `entity`), facets for other representations, refusals that name the nearest addresses that do resolve, and typed links with their inverses. A link crawler reads the whole namespace at the end of every deploy, about 3,200 addresses, and fails the deploy on a link that does not resolve or a pair with one end missing.
+- **The first application.** The entity mount gives patterns, games, routines and lessons addresses and links of their own. Building it left the grammar and the transport alone. The resolver needed one hook so a mount can answer for a link another mount starts, and two vocabulary rules had been written around pages and had to be widened. The spec's section 11 has the table.
+- **Bounds.** No read carries more than 100 links, and the rest is a page at a time behind `?as=links`. Every read is held to a byte cap and reads in ranges past it. A git tree reads to a stated depth. Each caller has a rate limit.
+- **Record keeping.** The server keeps a record of each request with no address in it, bounded in days and in bytes, and never served. No refusal names anything about the host.
+- **Hosts.** A server answers for a set of hosts and a set of one is enough. `tm://` lists them.
+- **Decided and not built, each with its reasons in the spec:** a link manifest emitted by the site's build (section 8), subscriptions (section 4), and tokens (section 10). Tokens wait for a mount that is not public; when they come, anonymous reads of public things stay.
+- **Deferred until there is a second box:** how two servers would find each other.
