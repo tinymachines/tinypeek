@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.6. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.6.1. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -90,8 +90,7 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 | | |
 |---|---|
 | TM-12, TM-16 | Live since 2026-10-10 (`public` `b2c4cec`), checked from outside and marked shipped in the spec. The entity mount is the `Entities` class in `api/tm.py`; spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
-| tinypeek#2, #3 | A link may carry `count`; no read carries more than 100 links, the rest is behind `?as=links` in one stated order, and the crawler walks the pages. Built and tested in `public`, waiting on a deploy. After it, re-check live and move the spec's `[planned: tinypeek#n, built, awaiting deploy]` markers to shipped |
-| public#7 | `lessons.json` keeps each lesson's game key (`against.key`, written by the website session's `scripts/board-lessons.py`), and `Entities` follows it: `tm:measures` is exact for all 25. Built and tested, waiting on the same deploy |
+| tinypeek#2, #3, public#7 | Live since 2026-10-10 (`public` `7faca76`), checked from outside and marked shipped: a link may carry `count`; no read carries more than 100 links and the rest is behind `?as=links` in one stated order; `tm:measures` is exact for all 25 lessons by `against.key` |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec. The work package is finished |
 
