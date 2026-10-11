@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.10.2. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.10.3. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -95,7 +95,7 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 | tinypeek#4 | Live since 2026-10-10 (`public` `745937b`), checked from outside and marked shipped: a git tree reads to a stated depth, and a listing at a ref names its children at that ref |
 | tinypeek#6 | Live since 2026-10-10 (`public` `b84f8b0`), checked from outside and marked shipped: a rate limit by caller in the transport (`RateLimit` in `api/mcp_server.py`; `api/app.py` passes the caller). Sessions on the box share one address, so a crawl over HTTP from any of them draws on one bucket; the crawler runs in-process and is not limited |
 | tinypeek#7 | Live since 2026-10-11 (`public` `e0c2c7b`), checked and marked shipped: an audit log of requests (`AuditLog` in `api/mcp_server.py`), with no address, outside the checkout, bounded in days and bytes; and no refusal quotes a host path. The log is in the service's state directory and cannot be read through the namespace, so a live check of it is a look on the box |
-| audit follow-up | A logged URI is cut to 300 characters with its length noted (it was 2,000). Built and tested in `public`, waiting on a deploy; one marker in spec section 10 moves after it. Known and stated: a caller inside the rate limit can still fill a day's 8 MiB by volume |
+| audit follow-up | Live since 2026-10-11 (`public` `6ec8d89`): a logged URI is cut to 300 characters with its length noted. Known and stated in the spec: a caller inside the rate limit can still fill a day's 8 MiB by volume |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec. The work package is finished |
 
