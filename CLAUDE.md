@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.4. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.5. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -89,12 +89,15 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 
 | | |
 |---|---|
-| **TM-12** | The connect instructions and the root resource should name the orientation documents (`public`'s `START-HERE.md` and `CLAUDE.md`, the 6502 project's `CLAUDE.md`). Open |
-| **TM-16** | An `entity` mount over `data/autopsy.json` and `data/lessons.json`: patterns, games, routines and lessons as addressable things with their own links. Spec section 11 has the shape. It is the test of whether layers 1 to 4 are finished: if it needs a change below it, that is the finding, not a workaround. Not started |
+| TM-12 | The root resource (`start_here`, `help` links) and the connect instructions name the orientation documents that resolve. Built and tested in `public`, waiting on a deploy. After it, re-check live and move the spec's markers from `[planned: TM-12, built, awaiting deploy]` to shipped |
+| TM-16 | The `entity` mount over `data/autopsy.json` and `data/lessons.json` (the `Entities` class in `api/tm.py`). Built and tested in `public`, waiting on a deploy; then re-check live and move its markers the same way. Spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
+| **A lesson's game** | `lessons.json` keeps the name of the game a lesson was measured beside, not its key, so `tm:measures` is inferred and joins 5 of 25 lessons. A key in the record would make it exact. The record's writer is `scripts/board-lessons.py`, which is the website session's file: ask, do not edit |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec (TM-11, 19 and 20 since 2026-10-10) |
 
-Also open in the spec: paging a large link set behind `?as=links&cursor=`;
+Also open in the spec: paging a large link set behind `?as=links&cursor=`
+(a pattern entity now carries up to 309 links in one read); a count has no
+field on a link and rides in its title;
 the git `tree` facet is one level, not recursive; tokens, a rate limit and
 an audit log are planned and not built (the live server is anonymous and
 serves only what is already public). A page's text has no size cap while its
@@ -103,7 +106,9 @@ HTML does; nothing live is near it.
 ## Traps already paid for
 
 - A check that can pass on nothing is not a check. When the crawler passes,
-  break what it guards on purpose and watch it fail.
+  break what it guards on purpose and watch it fail. To crawl a change
+  against the box's build before it is deployed, run the crawler from a
+  worktree with `--repo ../public`.
 - The namespace reads the beta's build too, so it can be briefly ahead of a
   beta that has not followed yet; the deploy runs the crawler after the
   follow for that reason.
