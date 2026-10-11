@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.6.1. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.7. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -91,6 +91,7 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 |---|---|
 | TM-12, TM-16 | Live since 2026-10-10 (`public` `b2c4cec`), checked from outside and marked shipped in the spec. The entity mount is the `Entities` class in `api/tm.py`; spec section 11 records what it asked of layers 1 to 4: one resolver hook (`inbound`) and two widened vocabulary rules |
 | tinypeek#2, #3, public#7 | Live since 2026-10-10 (`public` `7faca76`), checked from outside and marked shipped: a link may carry `count`; no read carries more than 100 links and the rest is behind `?as=links` in one stated order; `tm:measures` is exact for all 25 lessons by `against.key` |
+| tinypeek#8 | A page's text is held to the byte cap and reads in ranges past it (`?as=text&range=`). Built and tested in `public`, waiting on a deploy. After it, re-check live and move the spec's `[planned: tinypeek#8, built, awaiting deploy]` markers to shipped |
 | TM-17 | Completions. Not a bug: they exist; the auditing client never called them |
 | everything else | Live, and marked so in the spec. The work package is finished |
 
@@ -98,8 +99,7 @@ Open in the spec, each with an issue in this repository (filed 2026-10-10,
 none yet approved to build): the git `tree` facet is one level, not
 recursive (#4); tokens (#5), a rate limit (#6) and an audit log (#7) are
 planned and not built, since the live server is anonymous and serves only
-what is already public; a page's text has no size cap while its HTML does,
-and nothing live is near it (#8). Three open questions: a build-emitted
+what is already public. Three open questions: a build-emitted
 link manifest (#9), one server or several hosts (#10), subscriptions (#11).
 
 ## Traps already paid for
