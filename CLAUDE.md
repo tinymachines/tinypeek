@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.13. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.13.1. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -105,8 +105,8 @@ since the live server is anonymous and serves only what is already public. No op
 Settled on 2026-10-11 (#9): no build-emitted link manifest; spec section 8
 has the counts and what would reopen it, which is a second site.
 Settled on 2026-10-11 (#10): a server answers for a set of hosts and one is
-conformant; `tm://` lists them (`TOP` in `api/tm.py`), built and awaiting a
-deploy. Federation between servers waits for a second box.
+conformant; `tm://` lists them (`TOP` in `api/tm.py`), live since 2026-10-11
+(`public` `c23b2b3`) and checked from outside. Federation between servers waits for a second box.
 Settled on 2026-10-11 (#11): no subscriptions; a client reads `?as=stat`
 again, and spec section 4 says what each mount gives it to compare.
 
