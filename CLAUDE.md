@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.10.3. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.11. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
@@ -101,8 +101,9 @@ TM-20) lives in the owner's docs folder beside these repositories, under
 
 Open in the spec, each with an issue in this repository (filed 2026-10-10,
 none yet approved to build): tokens (#5) are planned and not built,
-since the live server is anonymous and serves only what is already public. Three open questions: a build-emitted
-link manifest (#9), one server or several hosts (#10), subscriptions (#11).
+since the live server is anonymous and serves only what is already public. Two open questions: one server or several hosts (#10), subscriptions (#11).
+Settled on 2026-10-11 (#9): no build-emitted link manifest; spec section 8
+has the counts and what would reopen it, which is a second site.
 
 ## Traps already paid for
 
