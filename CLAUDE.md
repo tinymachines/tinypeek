@@ -15,11 +15,13 @@ is connected to. This repository holds the protocol only:
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
+| `site/` | the public site, `tinypeek.tinymachines.ai`, an app on the tinymachines kit. Its own `README.md` says how to run, check and deploy it |
+| `extern/tinylens` | tinylens as a submodule; the site copies what it serves to `/lens/` at build time. Move it like the pin in `public`: fetch, checkout, commit the submodule |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
 
 It is public on GitHub (`tinymachines/tinypeek`, public since 2026-10-09).
 
-**Since 2026-10-12 it also carries a public site** that shows the protocol and serves tinylens, with showcases of the projects built on it (`docs/family.md`). The rule that keeps the family clean: only tinyhelper writes; tinylens only reads.
+**Since 2026-10-12 it also carries a public site** that shows the protocol and serves tinylens, with showcases of the projects built on it (`docs/family.md`). The rule that keeps the family clean: only tinyhelper writes; tinylens only reads. The site's gate is `site/check.sh`, which must end in `ALL OK` before a commit that changes `site/`. Deploying the site is the owner's word, typed in your session, as with `public`; `site/scripts/site-deploy.sh` refuses a dirty tree or a commit the check has not passed on.
 
 ## The server is in another repository
 

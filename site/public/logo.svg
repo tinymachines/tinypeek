@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- tinypeek: a pair of brackets, an address, and an eye looking through it -->
+  <g fill="none" stroke="#112658" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 10 H10 V54 H20"/>
+    <path d="M44 10 H54 V54 H44"/>
+    <circle cx="32" cy="32" r="11"/>
+  </g>
+  <circle cx="32" cy="32" r="4.5" fill="#112658"/>
+</svg>

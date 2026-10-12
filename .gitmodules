@@ -1,0 +1,3 @@
+[submodule "extern/tinylens"]
+	path = extern/tinylens
+	url = git@github.com:tinymachines/tinylens.git

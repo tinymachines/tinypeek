@@ -17,6 +17,9 @@ tm://tinymachines/http/tinymachines.ai/autopsy/lessons/jump
 |---|---|
 | [`spec/tm-protocol-spec.md`](spec/tm-protocol-spec.md) | The protocol: layers, grammar, facets, errors, mount contract, link vocabulary, safety. Every section is marked shipped, partial or planned. |
 | [`docs/stack-explainer.md`](docs/stack-explainer.md) | The plain-language companion: what MCP gives you, what tinypeek adds, and where each layer stops. Its last section is a status snapshot. |
+| [`docs/family.md`](docs/family.md) | The four projects around the protocol and who does what: only helpers write, the lens only reads. |
+| [`site/`](site/README.md) | The public site, `tinypeek.tinymachines.ai`: the spec and the explainer as they are here, tinylens at `/lens/`, and a showcase of the projects built on the protocol. |
+| [`extern/tinylens`](site/README.md) | tinylens, the browser for `tm://`, as a submodule the site serves. |
 | [`CLAUDE.md`](CLAUDE.md) | How a change flows between this repository and the server, for whoever works on either. |
 
 ## The idea in one diagram

@@ -1,0 +1,34 @@
+/* tinypeek's own styles: the documents (the spec and its companions, rendered from the repository's
+   Markdown) and the front door. Colours come from the kiosk tokens so every theme reaches them. */
+.home .sample { background: var(--sheet); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font: 14px/1.5 var(--mono, ui-monospace, monospace); margin: 18px 0; }
+.home .sheet h2, .showcase .sheet h2 { margin-top: 0; }
+.home .sheet ul { padding-left: 1.2em; }
+.showcase .walks { list-style: none; padding: 0; margin: 10px 0 0; }
+.showcase .walks li { padding: 6px 0; border-top: 1px solid var(--line); }
+.showcase .walks code { color: var(--mute); font-size: 13px; display: block; }
+
+/* prose on this site's own pages and in the documents: Tailwind's preflight strips heading sizes, paragraph
+   margins and list marks, and the kiosk sheet styles h1 only, so the rest is set here in the kiosk type */
+.home h2, .showcase h2, .doc .body h2 { font: 600 clamp(22px, 3vw, 28px)/1.15 var(--disp); margin: 0 0 10px; letter-spacing: -.01em; }
+.home h3, .showcase h3, .doc .body h3 { font: 600 clamp(18px, 2.4vw, 21px)/1.2 var(--disp); margin: 22px 0 8px; }
+.doc .body h4 { font: 600 17px/1.25 var(--disp); margin: 18px 0 6px; }
+.home p, .showcase p, .doc .body p { margin: 0 0 12px; }
+.home ul, .showcase ul, .doc .body ul { list-style: disc; padding-left: 1.3em; margin: 0 0 12px; }
+.doc .body ol { list-style: decimal; padding-left: 1.5em; margin: 0 0 12px; }
+.home li, .showcase li, .doc .body li { margin: 4px 0; }
+
+/* a document: the repository's Markdown, as it is. Headings keep the kiosk type; tables and code get room. */
+.doc .body { max-width: 72ch; }
+.doc .body h1 { font-size: clamp(28px, 4.5vw, 44px); }
+.doc .body h2 { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); }
+.doc .body h3 { margin-top: 26px; }
+.doc .body p, .doc .body li { line-height: 1.55; }
+.doc .body pre { background: var(--sheet); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13.5px/1.5 var(--mono, ui-monospace, monospace); }
+.doc .body code { font-family: var(--mono, ui-monospace, monospace); font-size: .92em; }
+.doc .body :not(pre) > code { background: var(--sheet); padding: 1px 5px; border-radius: 4px; }
+.doc .body table { display: block; overflow-x: auto; margin: 14px 0; }
+.doc .body th, .doc .body td { vertical-align: top; }
+.doc .body blockquote { margin: 14px 0; padding: 2px 16px; border-left: 3px solid var(--line); color: var(--ink2, var(--ink)); }
+.doc .body hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
+.doc .body img { max-width: 100%; }
+.doc .source { color: var(--mute); font-size: 14px; margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--line); }
