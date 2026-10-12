@@ -14,9 +14,12 @@ is connected to. This repository holds the protocol only:
 | `spec/tm-protocol-spec.md` | the spec, v0.14.1. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
+| `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
 | `LICENSE` | MIT. No visual6502 die data and no ROM content may ever land here; that is why it can be MIT |
 
 It is public on GitHub (`tinymachines/tinypeek`, public since 2026-10-09).
+
+**Since 2026-10-12 it also carries a public site** that shows the protocol and serves tinylens, with showcases of the projects built on it (`docs/family.md`). The rule that keeps the family clean: only tinyhelper writes; tinylens only reads.
 
 ## The server is in another repository
 
