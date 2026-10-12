@@ -85,7 +85,12 @@ Rebase onto theirs, keep both sides' substance, and say what you kept.
 
 ## State of the work
 
-Nothing is left open. The owner's work package (a black-box audit of the
+**Ideas, not work:** `docs/lens.md` (2026-10-12) is a browser for tm:// and
+five layer-2 candidates it would ask for, with one finding from the live
+server: a parameter a mount does not take is dropped, not refused. Each has
+an issue. None changes the spec until the owner picks it up.
+
+Apart from those ideas, nothing is left open. The owner's work package (a black-box audit of the
 namespace, TM-1 to TM-20) is finished and live; it lives in the owner's docs
 folder beside these repositories, under `feedback/`, and is in neither
 repository. Every issue filed here from the spec's open items is closed. The
