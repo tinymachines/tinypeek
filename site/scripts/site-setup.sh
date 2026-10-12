@@ -8,10 +8,13 @@ set -euo pipefail
 HOST=tinypeek.tinymachines.ai
 ROOT=/var/www/$HOST
 HERE=$(cd "$(dirname "$0")/.." && pwd)
-want=$(dig +short tinymachines.ai | tail -1)
-have=$(dig +short "$HOST" | tail -1)
-if [[ -z "$have" ]]; then echo "refusing: $HOST does not resolve yet. It needs an A record in the tinymachines.ai zone, the same address as tinymachines.ai."; exit 1; fi
-if [[ "$have" != "$want" ]]; then echo "refusing: $HOST resolves to $have, not where tinymachines.ai is ($want)."; exit 1; fi
+# asked of the box's own name server, which holds the zone: the box's default resolver answers its own names
+# with loopback, which says nothing about the record
+NS=${NS:-127.0.0.1}
+want=$(dig +short @"$NS" www.tinymachines.ai | tail -1)
+have=$(dig +short @"$NS" "$HOST" | tail -1)
+if [[ -z "$have" ]]; then echo "refusing: $HOST does not resolve yet. It needs an A record in the tinymachines.ai zone, the same address as www (./scripts/site-dns.sh)."; exit 1; fi
+if [[ "$have" != "$want" ]]; then echo "refusing: $HOST resolves to $have, not where www.tinymachines.ai is ($want)."; exit 1; fi
 if sudo test -d /etc/letsencrypt/accounts && [[ -n "$(sudo find /etc/letsencrypt/accounts -name regr.json | head -1)" ]]; then MAIL=(); else [[ -n "${CERTBOT_EMAIL:-}" ]] || { echo "refusing: no certbot account on this box yet; set CERTBOT_EMAIL for the first registration"; exit 1; }; MAIL=(-m "$CERTBOT_EMAIL"); fi
 if [[ ! -d "$ROOT" ]]; then sudo mkdir -p "$ROOT"; sudo chown "$USER":"$USER" "$ROOT"; echo "made $ROOT (owned by $USER, so ./scripts/site-deploy.sh needs no sudo)"; fi
 CONF=/etc/nginx/sites-available/$HOST.conf
