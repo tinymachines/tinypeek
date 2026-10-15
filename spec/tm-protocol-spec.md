@@ -1,6 +1,6 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.14.1 · 2026-10-11 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.15 · 2026-10-15 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
 Every marker below was checked against the running server. What each version changed, and when it went live, is in the [version history](#version-history) at the end.
 
@@ -148,19 +148,19 @@ Published templates (RFC 6570):
 ```
 tm://
 tm://{host}/
-tm://{host}/fs{/path*}
-tm://{host}/git/{repo}{/path*}{?at,as,n,depth}
-tm://{host}/http/{site}{/path*}{?as}
-tm://{host}/offbox/{name}
+tm://{host}/fs{/path*}{?as,range,cursor}
+tm://{host}/git/{repo}{/path*}{?at,as,n,depth,range,cursor}
+tm://{host}/http/{site}{/path*}{?as,range,cursor}
+tm://{host}/offbox/{name}{?as}
 ```
 
-These are the templates the live server publishes (`depth` on the git one [shipped: tinypeek#4]). It also accepts `as` and `range` on `fs`, `range` on `git`, and `cursor` on any collection, which the templates do not name. [shipped]
+These are the templates the live server publishes. **Each names every parameter its mount takes**, and a read refuses any other (§6), so a client can learn a mount's whole grammar from the server and need not carry a list of its own. Until v0.15 the templates named fewer parameters than the server took (`as` and `range` on `fs`, `range` on `git`, `cursor` on any collection), and tinylens carried the difference itself [shipped: tinypeek#13]. `tm://` and a host's root take `?as=links` only, and `cursor=` rides with `?as=links` on anything (§6), which the two literal templates do not spell out.
 
 The entity mount brings two more [shipped: TM-16]:
 
 ```
-tm://{host}/entity/{kind}/{key}{?as}
-tm://{host}/entity/game/{key}/routine/{routine}{?as}
+tm://{host}/entity/{kind}/{key}{?as,cursor}
+tm://{host}/entity/game/{key}/routine/{routine}{?as,cursor}
 ```
 
 ### Mounts on `tinymachines`
@@ -194,7 +194,9 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 
 Other params: `at=<ref>` (git; defaults to HEAD, and for `6502` to the commit the site serves), `n=<count>` (log, 1 to 100, default 20), `depth=<levels>` (git tree, above), `range=<start>-<end>` (fs and git; bytes `[start, end)` beyond the cap, the end stopping at the thing's end, at most the cap in one read). On http a range is of a page's text, in bytes of UTF-8, with `?as=text` or with no `as`; a cut inside a character reads as the replacement mark at that edge. A range on `rendered`, on `stat`, on a listing or on something that is not a page is refused as `bad-facet`, not dropped [shipped: tinypeek#8], `cursor=` (the `nextCursor` of a paged listing).
 
-**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. An unknown `as` is refused on every mount [shipped]. A collection offers only its listing (and, on git, `log`): a file's facet on one (`?as=stat` on an fs directory, `?as=rendered` on an http collection, `?as=stat` or `blame` on a git tree) is refused rather than dropped [shipped: TM-11].
+**Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. An unknown `as` is refused on every mount [shipped]. A collection offers only its listing (and, on git, `log`): a file's facet on one (`?as=stat` on an fs directory, `?as=rendered` on an http collection, `?as=stat` or `blame` on a git tree) is refused rather than dropped [shipped: TM-11]. **A parameter a mount does not take is refused too**, as `bad-facet` naming the ones it takes: `?at=` on an http page, `?lines=` anywhere. Before v0.15 it was dropped, and the answer looked like the one asked for (a page "at" a date the mount has no notion of). `cursor=` continues a listing or `?as=links`, and on anything else is refused the same way [shipped: tinypeek#13].
+
+**The echo:** the `uri` an answer carries is the thing's identity plus every parameter the read used, as it used it: a range as the bytes it became, a clamped `n` as the number it became, a listing's page with the cursor that reached it. A parameter that only spells out the default (`?as=raw` on a file, `?at=HEAD`, `?n=20`) is the identity and is left out. So a parameter a client sent and does not see in the echo is one the server did not use, and since v0.15 that cannot happen without a refusal [shipped: tinypeek#13].
 
 MimeType is decided by content as well as extension: valid UTF-8 with no NUL bytes in the first 8 KiB is text. Assembly sources return `text/x-asm`. [shipped]
 
@@ -211,7 +213,7 @@ Never a bare 404. Every failure is structured and, where possible, teaches the c
 | `bad-facet` (on `at=`) | An `at=` that is not a ref name (`..`, a leading `-`, a space) | Refused before git sees it |
 | `too-large` | Over the byte cap | Byte size and a `?range=` template; for an http page's HTML, its `?as=text` and `?as=stat`; for an http page's text, its size, a `?as=text&range=` template and its `?as=stat` [shipped: tinypeek#8] |
 | `binary` | Binary content without `as=raw` | mimeType and a `?as=stat` link |
-| `bad-facet` | Unsupported `as=` | The facets that path accepts |
+| `bad-facet` | Unsupported `as=`, or a parameter the mount does not take | The facets that path accepts, or the parameters the mount takes [the latter shipped: tinypeek#13] |
 | `out-of-root` | Traversal outside a mount (plain or percent-encoded) | — |
 | `denied` | Matches the deny-list | (the path is listed as `redacted`) |
 | `redirect` | An http path the site redirects | The status; `?as=stat` reports it without following |
@@ -475,6 +477,7 @@ Newest last. A version that changed behaviour says when it went live; one that s
 | v0.13 | Settles the last open question: there are no subscriptions, a client that wants to know whether a thing changed reads its `?as=stat` again, and §4 says what each mount gives it to compare, what that misses, and what would reopen it (tinypeek#11). No behaviour changes. |
 | v0.14 | Records the owner's decision on tokens (tinypeek#5): they stay planned and unbuilt, because nothing the server serves needs one, and when they come they add access and take none away. §10 has the reasons and the rules a build must keep. No behaviour changes, and with it nothing in §12 is left open. |
 | v0.14.1 | Editorial: this history moved out of the opening paragraph into a table, and §12 was renamed for what it now holds. No behaviour changes. |
+| v0.15 | Closes the one place the namespace still dropped something quietly (tinypeek#13, found by the first walk of the live server for the lens): a parameter a mount does not take is refused, naming the ones it takes; the echo carries every parameter a read used; and the templates name every parameter, so a client learns a mount's grammar from the server. §5, §6 and §7 say so. A client that sent a harmless extra parameter now gets a refusal; none was known to. |
 
 ---
 

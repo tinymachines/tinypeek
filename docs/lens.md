@@ -72,6 +72,8 @@ This matters for a browser before anything else. A time scrubber built today wou
 
 The likely fix: refuse a parameter the mount does not take with `bad-facet`, listing the ones it does, as an unknown `as` is refused today. The cost: any client that sends a harmless extra parameter starts getting refusals. None is known.
 
+**Settled in spec v0.15 (tinypeek#13).** The server refuses the parameter and names the ones the mount takes, the answer's `uri` carries every parameter the read used, and the templates name every parameter, so the lens can drop the list it carried of its own (`SPEC_EXTRAS`). Candidate 1 is no longer blocked on this.
+
 ### 1. One time axis on every mount
 
 **Today:** `?at=` is git only (§6), and means a ref.

@@ -45,7 +45,7 @@ MCP gives you addresses and a read verb. It doesn't give you a graph between the
 
 ## Status
 
-Spec v0.14. Everything it describes is live on the reference deployment and checked from outside, and no question in it is open. Three things were decided and not built, each with its reasons in the spec: a build-emitted link manifest, subscriptions, and tokens.
+Spec v0.15. Everything it describes is live on the reference deployment and checked from outside, and no question in it is open. Three things were decided and not built, each with its reasons in the spec: a build-emitted link manifest, subscriptions, and tokens.
 
 ## Reference deployment
 
