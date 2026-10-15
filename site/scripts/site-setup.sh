@@ -16,7 +16,7 @@ have=$(dig +short @"$NS" "$HOST" | tail -1)
 if [[ -z "$have" ]]; then echo "refusing: $HOST does not resolve yet. It needs an A record in the tinymachines.ai zone, the same address as www (./scripts/site-dns.sh)."; exit 1; fi
 if [[ "$have" != "$want" ]]; then echo "refusing: $HOST resolves to $have, not where www.tinymachines.ai is ($want)."; exit 1; fi
 if sudo test -d /etc/letsencrypt/accounts && [[ -n "$(sudo find /etc/letsencrypt/accounts -name regr.json | head -1)" ]]; then MAIL=(); else [[ -n "${CERTBOT_EMAIL:-}" ]] || { echo "refusing: no certbot account on this box yet; set CERTBOT_EMAIL for the first registration"; exit 1; }; MAIL=(-m "$CERTBOT_EMAIL"); fi
-if [[ ! -d "$ROOT" ]]; then sudo mkdir -p "$ROOT"; sudo chown "$USER":"$USER" "$ROOT"; echo "made $ROOT (owned by $USER, so ./scripts/site-deploy.sh needs no sudo)"; fi
+if [[ ! -d "$ROOT" ]]; then sudo mkdir -p "$ROOT"; sudo chown "$USER":"$USER" "$ROOT"; echo "made $ROOT (owned by $USER, so bun run deploy needs no sudo)"; fi
 CONF=/etc/nginx/sites-available/$HOST.conf
 if [[ ! -f "$CONF" ]]; then
   sudo tee "$CONF" >/dev/null <<NGINX
@@ -48,4 +48,4 @@ sudo nginx -t
 sudo systemctl reload nginx
 if [[ ! -d /etc/letsencrypt/live/$HOST ]]; then sudo certbot --nginx -d "$HOST" --non-interactive --agree-tos --redirect "${MAIL[@]}"; fi
 if [[ ! -L /etc/nginx/sites-enabled/$HOST.conf ]]; then diff -q "$CONF" /etc/nginx/sites-enabled/$HOST.conf >/dev/null || sudo cp /etc/nginx/sites-enabled/$HOST.conf "$CONF"; fi
-echo "ok: https://$HOST serves $ROOT. Next: $HERE/scripts/site-deploy.sh"
+echo "ok: https://$HOST serves $ROOT. Next: cd $HERE && bun run deploy"

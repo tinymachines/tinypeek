@@ -21,7 +21,7 @@ is connected to. This repository holds the protocol only:
 
 It is public on GitHub (`tinymachines/tinypeek`, public since 2026-10-09).
 
-**Since 2026-10-12 it also carries a public site** that shows the protocol and serves tinylens, with showcases of the projects built on it (`docs/family.md`). The rule that keeps the family clean: only tinyhelper writes; tinylens only reads. The site's gate is `site/check.sh`, which must end in `ALL OK` before a commit that changes `site/`. Deploying the site is the owner's word, typed in your session, as with `public`; `site/scripts/site-deploy.sh` refuses a dirty tree or a commit the check has not passed on.
+**Since 2026-10-12 it also carries a public site** that shows the protocol and serves tinylens, with showcases of the projects built on it (`docs/family.md`). The rule that keeps the family clean: only tinyhelper writes; tinylens only reads. The site's gate is `bun run check` in `site/` (the kit's `kit check`), which must end in `ALL OK` before a commit that changes `site/`. Deploying the site is the owner's word, typed in your session, as with `public`; `bun run deploy` in `site/` (the kit's `kit deploy`) refuses a dirty tree or a commit the check has not passed on.
 
 ## The server is in another repository
 

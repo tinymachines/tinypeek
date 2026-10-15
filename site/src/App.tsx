@@ -14,8 +14,8 @@ import Showcase from "./pages/Showcase";
 import Doc from "./pages/Doc";
 import { DOCS } from "./docs";
 
-// No account page and no account load: this site has no account service behind it, so the kit is
-// never asked who is signed in. The lens at /lens/ is outside the app (app.config.ts: outside).
+// No account page and no account load: this site has no account service behind it (app.config.ts:
+// accounts: false), so the kit offers no Sign in and never asks who is signed in. The lens at /lens/ is outside the app (app.config.ts: outside).
 
 function NotHere({ path }: { path: string }) {
   return <article><h1>Not here</h1><p>There is no page at {path}.</p><p><a href="/" onClick={onLink}>Home</a></p></article>;

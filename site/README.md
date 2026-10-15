@@ -27,14 +27,14 @@ To move the lens forward: `git -C extern/tinylens fetch && git -C extern/tinylen
 ## The check
 
 ```bash
-./check.sh           # must end in ALL OK
+bun run check        # the kit's kit check; must end in ALL OK
 ```
 
-It builds the site, serves the build the way nginx will (`scripts/serve.ts`) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens is served beside the app as files, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
+It builds the site, serves the build the way nginx will (the kit's `kit check`, on a free port) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens is served beside the app as files, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
 
 ## Deploy
 
-Deploying is the owner's word. `scripts/site-setup.sh` makes the nginx site and its certificate, once the name resolves (the DNS record is in the `tinymachines.ai` zone, which this repository does not describe). `scripts/site-deploy.sh` builds and publishes, and refuses on a dirty tree or a commit the check has not passed on.
+Deploying is the owner's word. `scripts/site-setup.sh` makes the nginx site and its certificate, once the name resolves (the DNS record is in the `tinymachines.ai` zone, which this repository does not describe). `bun run deploy` (the kit's `kit deploy`) builds and publishes, and refuses on a dirty tree or a commit the check has not passed on.
 
 ## What is here
 
@@ -47,8 +47,8 @@ Deploying is the owner's word. `scripts/site-setup.sh` makes the nginx site and 
 | `src/pages/Home.tsx`, `src/pages/Showcase.tsx` | the front door and the showcase |
 | `src/styles/tinypeek.css` | the site's own styles, over the kit's |
 | `scripts/lens.ts` | the lens copied in from the submodule |
-| `scripts/serve.ts`, `scripts/check-site.ts`, `check.sh` | the check |
-| `scripts/site-setup.sh`, `scripts/site-deploy.sh` | the host |
+| `scripts/check-site.ts` | the check (`bun run check` runs it against the served build) |
+| `scripts/site-setup.sh`, `scripts/site-dns.sh` | the host, once (`bun run deploy` after every checked commit) |
 
 ## Not covered
 

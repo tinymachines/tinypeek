@@ -8,11 +8,13 @@
     "lens": "bun run scripts/lens.ts",
     "build": "bun run lens && tsc -b && vite build",
     "typecheck": "tsc -b",
-    "serve": "bun run scripts/serve.ts dist 4411",
-    "check": "./check.sh"
+    "lint": "eslint . --max-warnings 0",
+    "serve": "kit serve",
+    "check": "kit check",
+    "deploy": "kit deploy"
   },
   "dependencies": {
-    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.1.7",
+    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.2.2",
     "marked": "^18.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

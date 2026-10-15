@@ -1,4 +1,4 @@
-// The site's done-check, against a served build (scripts/serve.ts): every page opens with no error and fits
+// The site's done-check, against a served build (the kit's kit check serves it): every page opens with no error and fits
 // a phone, the frame carries the name and the mark, each document shows its own first heading with anchors
 // on its sections and no link left pointing at a Markdown file, the lens is served beside the app as files,
 // the Menu lists the doors, a theme pick is kept under the app's own prefix and survives a reload, the

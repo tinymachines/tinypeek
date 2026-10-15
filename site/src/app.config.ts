@@ -15,6 +15,8 @@ export const APP: AppConfig = {
   logo: "/logo.svg",
   build,
   theme: { default: "paper" },
+  // nothing to sign in to: the kit offers no Sign in anywhere and asks no account service (kit v0.1.8+)
+  accounts: false,
   // the lens is served beside the app, not by it: a link to /lens/ is a full load
   outside: /^\/lens(\/|$)/,
   pages: [
