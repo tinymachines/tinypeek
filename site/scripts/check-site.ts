@@ -2,9 +2,13 @@
 // a phone, the frame carries the name and the mark, each document shows its own first heading with anchors
 // on its sections and no link left pointing at a Markdown file, the lens and LensKit are served beside the app as files,
 // the Menu lists the doors, a theme pick is kept under the app's own prefix and survives a reload, the
-// share panel draws a QR code, the app page reads the offline copy, and the spec opens offline.
+// share panel draws a QR code, Your files keeps a picked file on this device and a file shared from another app lands there,
+// the app page reads the offline copy, and the spec opens offline.
 //   bun run scripts/check-site.ts [origin]      default http://127.0.0.1:4411
 import puppeteer, { type Page } from "puppeteer-core";
+import { mkdtempSync as kfMkdtemp, writeFileSync as kfWrite } from "node:fs";
+import { tmpdir as kfTmp } from "node:os";
+import { join as kfJoin } from "node:path";
 
 const origin = (process.argv[2] ?? "http://127.0.0.1:4411").replace(/\/$/, "");
 let fails = 0;
@@ -16,13 +20,13 @@ const page: Page = await ctx.newPage();
 const errors: string[] = [];
 page.on("pageerror", (e) => errors.push(e.message));
 let offline = false;
-page.on("console", (m) => { if (m.type() === "error" && !offline) errors.push(m.text()); });
+page.on("console", (m) => { if (m.type() === "error" && !offline && !/status of 401/.test(m.text())) errors.push(m.text()); });   // 401: the account service, to a reader not signed in
 await page.setViewport({ width: 390, height: 844 });
 const text = (sel: string) => page.evaluate((s) => document.querySelector(s)?.textContent?.trim() ?? "", sel);
 const clickText = (sel: string, t: string) => page.evaluate((s, t) => { const el = [...document.querySelectorAll<HTMLElement>(s)].find((e) => e.textContent?.includes(t)); el?.click(); return !!el; }, sel, t);
 
 // 1. every page, no errors, the frame, a phone's width
-for (const p of ["/", "/spec", "/explainer", "/family", "/showcase", "/theme", "/app", "/share", "/account", "/nowhere"]) {
+for (const p of ["/", "/spec", "/explainer", "/family", "/showcase", "/theme", "/app", "/share", "/account", "/files", "/nowhere"]) {
   await page.goto(`${origin}${p}`, { waitUntil: "networkidle0" });
   const h1 = await text("main h1");
   const brand = await text("header .brand");
@@ -111,6 +115,35 @@ await clickText("button", "QR code");
 await sleep(300);
 const share = await page.evaluate(() => ({ qr: [...document.querySelectorAll("svg path")].some((p) => (p.getAttribute("d")?.length ?? 0) > 2000), places: document.querySelectorAll("a").length }));
 ok(share.places >= 10 && share.qr, `the panel lists the places (${share.places} links) and draws a QR code`);
+
+// 6b. your files, signed out: a file picked through <tc-pick> is kept on this device, and opens (the kit's Your files)
+const kfSample = kfJoin(kfMkdtemp(kfJoin(kfTmp(), "tinypeek-check-")), "hello.txt");
+kfWrite(kfSample, "hello from tinypeek's check\n");
+await page.goto(`${origin}/files`, { waitUntil: "networkidle0" });
+const kfInput = await page.evaluateHandle(() => document.querySelector("tc-pick")!.shadowRoot!.querySelector("input.files"));
+await (kfInput as unknown as { uploadFile(p: string): Promise<void> }).uploadFile(kfSample);
+let kfRows: string[] = [];
+for (let i = 0; i < 40 && !kfRows.some((r) => r.startsWith("hello.txt")); i++) { await sleep(250); kfRows = await page.evaluate(() => [...document.querySelectorAll(".kfiles li")].map((li) => `${li.querySelector(".open")?.textContent} | ${li.querySelector(".state")?.textContent}`)); }
+ok(kfRows.some((r) => /^hello\.txt \| On this device/.test(r)), `your files: a picked file is kept on this device (${kfRows.join("; ")})`);
+await page.evaluate(() => [...document.querySelectorAll<HTMLElement>(".kfiles .open")].find((e) => e.textContent?.includes("hello.txt"))?.click());
+await page.waitForSelector(".kfile-view pre", { timeout: 4000 }).catch(() => null);
+ok((await text(".kfile-view pre")).startsWith("hello from tinypeek's check"), "your files: opening it shows what it holds");
+// a file shared to tinypeek from another app (the Share menu's multipart POST, taken by the service worker) lands there
+await page.goto(`${origin}/app`, { waitUntil: "networkidle0" });
+await page.evaluate(() => navigator.serviceWorker.ready);
+const kfLanded = await page.evaluate(async () => {
+  const form = new FormData();
+  form.append("files", new File(["shared from another app\n"], "shared note.txt", { type: "text/plain" }));
+  const r = await fetch("/share", { method: "POST", body: form });
+  return new URL(r.url).pathname + new URL(r.url).search;
+});
+await page.goto(`${origin}${kfLanded}`, { waitUntil: "networkidle0" });
+await page.waitForFunction(() => /Open it in Your files/.test(document.querySelector("main")?.textContent ?? ""), { timeout: 8000 }).catch(() => null);
+ok(/Open it in Your files/.test(await text("main")), `share: the share page says the file went to Your files (${kfLanded})`);
+await page.goto(`${origin}/files`, { waitUntil: "networkidle0" });
+kfRows = [];
+for (let i = 0; i < 40 && !kfRows.some((r) => r.startsWith("shared note.txt")); i++) { await sleep(250); kfRows = await page.evaluate(() => [...document.querySelectorAll(".kfiles li .open")].map((b) => b.textContent ?? "")); }
+ok(kfRows.includes("shared note.txt"), `share: it is in Your files (${kfRows.join("; ")})`);
 
 // 7. the app page reads the worker's offline copy, and the spec opens offline
 await page.goto(`${origin}/app`, { waitUntil: "networkidle0" });

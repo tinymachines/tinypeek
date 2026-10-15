@@ -48,7 +48,7 @@ export default defineConfig({
           { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png" },
           { src: "/pwa-512x512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
-        share_target: { action: "/share", method: "POST", enctype: "multipart/form-data", params: { title: "title", text: "text", url: "url", files: [{ name: "files", accept: ["image/*", "video/*", "text/*", "application/json"] }] } },
+        share_target: { action: "/share", method: "POST", enctype: "multipart/form-data", params: { title: "title", text: "text", url: "url", files: [{ name: "files", accept: ["*/*", "image/*", "video/*", "audio/*", "text/*", "application/pdf", "application/json"] }] } },
       },
     }),
   ],
