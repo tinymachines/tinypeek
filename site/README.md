@@ -1,6 +1,6 @@
 # The tinypeek site
 
-The public site of the `tm://` protocol, at `https://tinypeek.tinymachines.ai`. It serves the protocol (the spec and its explainer, rendered from the Markdown in this repository at build time, so the site can never show a version the repository does not have), the browser for it (tinylens, at `/lens/`), and a showcase of the three projects built on it. `docs/family.md` says who does what.
+The public site of the `tm://` protocol, at `https://tinypeek.tinymachines.ai`. It serves the protocol (the spec and its explainer, rendered from the Markdown in this repository at build time, so the site can never show a version the repository does not have), the browser for it (tinylens, at `/lens/`, and its canvas face LensKit at `/lens/kit/`), and a showcase of the three projects built on it. `docs/family.md` says who does what.
 
 It is an app on the tinymachines kit (`@tinymachines/kit`, pinned to a tag in `package.json`): the kiosk look, themes checked for contrast, install and offline, sharing. The kit ships as TypeScript source and is compiled with the app.
 
@@ -16,7 +16,7 @@ bun run dev          # http://localhost:4410
 
 ## The lens
 
-tinylens is a submodule at `extern/tinylens`. `scripts/lens.ts` copies what it serves (its page, its source and the recorded walk) into `public/lens/`, which the build ships as it is at `/lens/`; the build runs it first, and it refuses when the submodule is empty. The lens reads the live namespace from the visitor's browser and the app's service worker never answers for it.
+tinylens is a submodule at `extern/tinylens`. `scripts/lens.ts` copies what it serves (its page, its source, LensKit's `kit/` and the recorded walk) into `public/lens/`, which the build ships as it is at `/lens/`; the build runs it first, and it refuses when the submodule is empty or older than LensKit. The lens reads the live namespace from the visitor's browser and the app's service worker never answers for it.
 
 ```bash
 git submodule update --init         # once, after a clone
@@ -30,7 +30,7 @@ To move the lens forward: `git -C extern/tinylens fetch && git -C extern/tinylen
 bun run check        # the kit's kit check; must end in ALL OK
 ```
 
-It builds the site, serves the build the way nginx will (the kit's `kit check`, on a free port) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens is served beside the app as files, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
+It builds the site, serves the build the way nginx will (the kit's `kit check`, on a free port) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens and LensKit are served beside the app as files and LensKit settles on the recorded walk, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
 
 ## Deploy
 

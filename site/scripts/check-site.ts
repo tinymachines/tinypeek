@@ -1,6 +1,6 @@
 // The site's done-check, against a served build (the kit's kit check serves it): every page opens with no error and fits
 // a phone, the frame carries the name and the mark, each document shows its own first heading with anchors
-// on its sections and no link left pointing at a Markdown file, the lens is served beside the app as files,
+// on its sections and no link left pointing at a Markdown file, the lens and LensKit are served beside the app as files,
 // the Menu lists the doors, a theme pick is kept under the app's own prefix and survives a reload, the
 // share panel draws a QR code, the app page reads the offline copy, and the spec opens offline.
 //   bun run scripts/check-site.ts [origin]      default http://127.0.0.1:4411
@@ -57,6 +57,15 @@ const core = await fetch(`${origin}/lens/src/core.js`);
 ok(core.ok && /javascript/.test(core.headers.get("content-type") ?? ""), `/lens/src/core.js is served as JavaScript (${core.headers.get("content-type")})`);
 const miss = await fetch(`${origin}/lens/nothing.js`);
 ok(miss.status === 404, `a missing lens file is a miss, not the app's shell (${miss.status})`);
+// LensKit, beside the lens: its page, a module it imports from the lens's source, and nothing from another host
+const kit = await fetch(`${origin}/lens/kit/`);
+const kitHtml = await kit.text();
+ok(kit.ok && kitHtml.includes("LensKit") && kitHtml.includes("main.js") && !/<(?:link|script)\b[^>]*\b(?:href|src)="https?:/.test(kitHtml), `/lens/kit/ is LensKit, fetching from no other host (${kit.status}, ${kitHtml.length} bytes)`);
+const kitJs = await fetch(`${origin}/lens/kit/helper.js`);
+ok(kitJs.ok && /javascript/.test(kitJs.headers.get("content-type") ?? ""), `/lens/kit/helper.js is served as JavaScript (${kitJs.headers.get("content-type")})`);
+await page.goto(`${origin}/lens/kit/?recorded`, { waitUntil: "networkidle0" });
+const kitUp = await page.waitForFunction(() => (window as unknown as { kit?: { settled(): boolean } }).kit?.settled(), { timeout: 20000 }).then(() => true, () => false);
+ok(kitUp, "LensKit opens on the recorded walk and settles");
 const slash = await fetch(`${origin}/lens`, { redirect: "manual" });
 ok(slash.status === 301 && (slash.headers.get("location") ?? "").endsWith("/lens/"), `/lens goes to /lens/ (${slash.status})`);
 await page.goto(`${origin}/showcase`, { waitUntil: "networkidle0" });
