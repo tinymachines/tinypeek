@@ -36,6 +36,8 @@ server {
     location /assets/ { add_header Cache-Control "public, max-age=31536000, immutable" always; }
     # the lens reads the namespace itself and is served as it is; a missing file there is a miss, never the shell
     location /lens/ { try_files \$uri \$uri/ =404; add_header Cache-Control "no-cache" always; }
+    # tinyhelper, a user service on loopback: an ask needs its token, and a read without it sees only what ask made
+    location /helper/ { proxy_pass http://127.0.0.1:7420/; proxy_set_header Host \$host; proxy_read_timeout 90s; }
     location / { try_files \$uri \$uri/ /index.html; }
     listen 80;
     listen [::]:80;

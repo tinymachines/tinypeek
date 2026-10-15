@@ -17,8 +17,8 @@ export const APP: AppConfig = {
   theme: { default: "paper" },
   // nothing to sign in to: the kit offers no Sign in anywhere and asks no account service (kit v0.1.8+)
   accounts: false,
-  // the lens is served beside the app, not by it: a link to /lens/ is a full load
-  outside: /^\/lens(\/|$)/,
+  // the lens and the helper are served beside the app, not by it: a link to /lens/ or /helper/ is a full load
+  outside: /^\/(lens|helper)(\/|$)/,
   pages: [
     { path: "/", title: "tinypeek", card: "home", index: true, kicker: "the tm:// protocol", description: "The tm:// protocol: a read-only URI namespace over MCP, its spec, a browser for it, and the three projects built on it." },
     { path: "/spec", title: "The spec", card: "plain", index: true, kicker: "spec", description: "The tm:// protocol specification, as it is in the repository. Every section is marked shipped, partial or planned." },

@@ -68,6 +68,19 @@ const kitUp = await page.waitForFunction(() => (window as unknown as { kit?: { s
 ok(kitUp, "LensKit opens on the recorded walk and settles");
 const slash = await fetch(`${origin}/lens`, { redirect: "manual" });
 ok(slash.status === 301 && (slash.headers.get("location") ?? "").endsWith("/lens/"), `/lens goes to /lens/ (${slash.status})`);
+// the helper, fronted at /helper/: with the app's worker in charge, a visit there reaches the service, never the shell
+await page.goto(`${origin}/`, { waitUntil: "networkidle0" });
+await page.evaluate(() => navigator.serviceWorker.ready);
+// in a tab of its own, under the same worker: a JSON page has no icon, and Chrome's ask for /favicon.ico is not the site's error
+const helperTab = await ctx.newPage();
+await helperTab.goto(`${origin}/helper/health`, { waitUntil: "networkidle0" });
+const health = await helperTab.evaluate(() => document.body.innerText);
+await helperTab.close();
+let helperUp = false;
+try { helperUp = JSON.parse(health).ok === true; } catch { /* the shell, or nothing */ }
+ok(helperUp, `/helper/health is the helper, past the worker (${health.slice(0, 60).replace(/\s+/g, " ")})`);
+const anon = await fetch(`${origin}/helper/v1/findings`);
+ok(anon.ok && Array.isArray(await anon.json()), `/helper/v1/findings answers a reader without the token (${anon.status})`);
 await page.goto(`${origin}/showcase`, { waitUntil: "networkidle0" });
 const walk = await page.evaluate(() => (document.querySelector<HTMLAnchorElement>("main .walks a"))?.getAttribute("href") ?? "");
 ok(walk.startsWith("/lens/?uri=tm%3A%2F%2F"), `the showcase's walks open the lens on an address (${walk.slice(0, 40)})`);

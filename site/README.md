@@ -24,13 +24,17 @@ git submodule update --init         # once, after a clone
 
 To move the lens forward: `git -C extern/tinylens fetch && git -C extern/tinylens checkout <commit>`, then commit `extern/tinylens`, so this repository never points at a commit the lens's repository does not have.
 
+## The helper
+
+tinyhelper, which keeps the answers to questions asked in LensKit, runs on the box as a user service on loopback, and the site fronts it at `/helper/` (an nginx location in `scripts/site-setup.sh`). The app's service worker passes `/helper/` through and the app treats it as outside, so the shell never answers there. Asking needs the helper's token; a read without it sees only the answers the `ask` driver made. The check reaches the same service through the kit's proxy, so the helper must be running for the check to pass.
+
 ## The check
 
 ```bash
 bun run check        # the kit's kit check; must end in ALL OK
 ```
 
-It builds the site, serves the build the way nginx will (the kit's `kit check`, on a free port) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens and LensKit are served beside the app as files and LensKit settles on the recorded walk, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
+It builds the site, serves the build the way nginx will (the kit's `kit check`, on a free port) and drives it in headless Chrome (`scripts/check-site.ts`): every page opens with no error and fits a phone, each document shows its own first heading with anchors on its sections and no link left at a Markdown file, the lens and LensKit are served beside the app as files and LensKit settles on the recorded walk, `/helper/` reaches the helper past the worker, the Menu lists the doors, a theme pick survives a reload under the app's own prefix, the share panel draws a QR code, and the spec opens offline. When it passes it writes the commit to `out/check-ok`; the deploy refuses without it. When you change what it guards, break it on purpose and watch it fail.
 
 ## Deploy
 

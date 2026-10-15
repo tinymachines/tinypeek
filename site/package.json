@@ -10,7 +10,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings 0",
     "serve": "kit serve",
-    "check": "kit check",
+    "check": "kit check --proxy /helper/=http://127.0.0.1:7420/",
     "deploy": "kit deploy"
   },
   "dependencies": {
