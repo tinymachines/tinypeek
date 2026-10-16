@@ -109,6 +109,8 @@ A mount with no past refuses it.
 
 **Open:** the line between an address and a query language. This is where a search engine meets the grammar, and it is the candidate most likely to turn layer 2 into something else.
 
+**Settled in spec v0.18 (tinypeek#17).** The smallest form: `?as=links` takes `rel=` and `min=`, the echo carries them, so the found-in links of a pattern filtered by count is an address, paged like the whole set and versioned by its thing's stat. The line is one rel and one lower bound on `count`; a second dimension, a join or a walk would reopen it, and a saved walk is a file in a repository, which is idea 4.
+
 ### 4. A trail as an address
 
 **The idea:** a named, ordered list of addresses, the memex trail, read like anything else, with links to each step and from each step back to the trails it is on.
