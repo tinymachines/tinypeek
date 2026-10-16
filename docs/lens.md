@@ -125,6 +125,8 @@ A mount with no past refuses it.
 
 **The idea:** a device, a place or an object as a host or a mount. The grammar may already take it, as it took the entity mount. The pressure is on federation: physical hosts multiply, and "how do I find the server for this name" stops being hypothetical.
 
+**Settled in spec v0.20 (tinypeek#19).** The grammar does take it, both ways: as a mount of a host that answers (the way `entity/` came) or as a host of its own, and the line between a mount, a host and an `offbox` node is a server. Nothing is built until the first device or bench with readable state exists; it decides which way it comes, and if it comes as a host of its own, federation (#10) and tokens (#5) are scheduled with it. With this, all five ideas here are settled: 1 to 4 built, 5 decided.
+
 ## The test
 
 The spec holds every layer to one rule: a layer is done when the layer above it can be built without changing it. A browser is a layer-5 application, so building one is a test of layer 2.

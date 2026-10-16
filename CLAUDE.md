@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.19. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.20. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
@@ -90,12 +90,17 @@ Rebase onto theirs, keep both sides' substance, and say what you kept.
 
 ## State of the work
 
-**Ideas, not work:** `docs/lens.md` (2026-10-12) is a browser for tm:// and
-five layer-2 candidates it would ask for, with one finding from the live
-server: a parameter a mount does not take is dropped, not refused. Each has
-an issue. None changes the spec until the owner picks it up.
+**The lens's ideas are settled.** `docs/lens.md` (2026-10-12) is a browser
+for tm:// and five layer-2 candidates it would ask for. Between 2026-10-15
+and 2026-10-16 the owner took them up in order: the refused parameter
+(v0.15, #13), one time axis (v0.16, #15), a readable piece (v0.17, #16), an
+address for a set (v0.18, #17), a trail (v0.19, #18), and hosts that are not
+machines, decided and not built (v0.20, #19). Each has its reasons in the
+spec and a settled line in `docs/lens.md`. What is still open: #20
+(tinyhelper's first ask, the owner's step) and #21 (an entity at a time, an
+idea with a planned marker in §6).
 
-Apart from those ideas, nothing is left open. The owner's work package (a black-box audit of the
+Apart from those, nothing is left open. The owner's work package (a black-box audit of the
 namespace, TM-1 to TM-20) is finished and live; it lives in the owner's docs
 folder beside these repositories, under `feedback/`, and is in neither
 repository. Every issue filed here from the spec's open items is closed. The
@@ -120,6 +125,7 @@ reopen it:
 | No subscriptions (#11) | Section 4. A client reads `?as=stat` again. A need to know within seconds, or tokens, would reopen it |
 | Tokens stay planned (#5) | Section 10, the owner's decision on 2026-10-11. A mount that is not public, or a second client, would schedule it; anonymous reads of public things stay |
 | Federation (#10) | Section 5. A server answers for a set of hosts and one is conformant; how two servers find each other waits for a second box |
+| Hosts that are not machines (#19) | Section 5. The grammar takes a device or a place as a mount or as a host; the first one with readable state decides which, and schedules federation and tokens if it is a host of its own |
 
 ## Traps already paid for
 
