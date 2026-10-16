@@ -117,6 +117,8 @@ A mount with no past refuses it.
 
 **Open:** where a trail lives. The protocol is read-only, so a trail is written somewhere else (a file in a repository is enough) and read through a mount. That may make it no grammar change at all, which would be the best answer.
 
+**Settled in spec v0.19 (tinypeek#18).** It was no grammar change. A trail is a JSON file under a directory the server names (`fs/notes/trails/` on tinymachines), read as itself; the server adds `tm:step` to each step as written, a quote included, and `tm:step-of` from every step back, on whatever mount the step lives. The crawler holds the pair, so a stale trail fails a deploy. The first trail is the brief.
+
 ### 5. Hosts that are not machines
 
 **Today:** a host is a name a server answers for, and how a client finds another server waits for a second box (#10).
