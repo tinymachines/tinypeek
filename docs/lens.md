@@ -99,6 +99,8 @@ A mount with no past refuses it.
 
 **Open:** a fragment is not part of identity by the spec's own rule, so the readable span is probably a facet (`?lines=10-20`, `?pointer=/games/3`) and the fragment stays a hint.
 
+**Settled in spec v0.17 (tinypeek#16).** The span is a facet, and there are three: `range` (bytes), `lines` (of a file or a page's text) and `pointer` (into a JSON file), one a read. The echo keeps the span, so a quote keeps its address. An entity's `tm:data` now carries its pointer as the facet and reads the piece; the fragment rule stays for clients. Not covered: a span by heading or selector.
+
 ### 3. An address for a set
 
 **Today:** a collection is a directory, a listing or an entity kind. There is no address for "the result of this walk".
