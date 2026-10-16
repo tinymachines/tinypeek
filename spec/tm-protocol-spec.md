@@ -1,6 +1,6 @@
 # tm:// Protocol Spec — Read-Only URI Namespace over MCP
 
-**Version 0.15 · 2026-10-15 · Spicy / Meatball Labs · [tinypeek](../README.md)**
+**Version 0.16 · 2026-10-15 · Spicy / Meatball Labs · [tinypeek](../README.md)**
 
 Every marker below was checked against the running server. What each version changed, and when it went live, is in the [version history](#version-history) at the end.
 
@@ -148,7 +148,7 @@ Published templates (RFC 6570):
 ```
 tm://
 tm://{host}/
-tm://{host}/fs{/path*}{?as,range,cursor}
+tm://{host}/fs{/path*}{?at,as,range,cursor}
 tm://{host}/git/{repo}{/path*}{?at,as,n,depth,range,cursor}
 tm://{host}/http/{site}{/path*}{?as,range,cursor}
 tm://{host}/offbox/{name}{?as}
@@ -192,9 +192,13 @@ The fourth mount arrived without a grammar change, which is the layer-2 test fro
 | `tree` | git | The listing of a tree, one level, paged; the default for a git collection | [shipped] |
 | `tree` with `depth=N` | git | The tree to N levels, 1 to 8, in one read. Each entry is named by its path below the tree and carries its `depth`; entries come in path order, so a directory is just before what is in it, and a directory at the last level is listed to be read on. Paged like any listing, 500 entries a page. A submodule is listed and never entered. A denied name is `redacted` at any depth. `depth=1` is the plain listing, directories first. A depth out of range, or on something that is not a tree listing, is `bad-facet` | [shipped: tinypeek#4] |
 
-Other params: `at=<ref>` (git; defaults to HEAD, and for `6502` to the commit the site serves), `n=<count>` (log, 1 to 100, default 20), `depth=<levels>` (git tree, above), `range=<start>-<end>` (fs and git; bytes `[start, end)` beyond the cap, the end stopping at the thing's end, at most the cap in one read). On http a range is of a page's text, in bytes of UTF-8, with `?as=text` or with no `as`; a cut inside a character reads as the replacement mark at that edge. A range on `rendered`, on `stat`, on a listing or on something that is not a page is refused as `bad-facet`, not dropped [shipped: tinypeek#8], `cursor=` (the `nextCursor` of a paged listing).
+Other params: `at=<ref or time>` (git and fs, below; on git it defaults to HEAD, and for `6502` to the commit the site serves), `n=<count>` (log, 1 to 100, default 20), `depth=<levels>` (git tree, above), `range=<start>-<end>` (fs and git; bytes `[start, end)` beyond the cap, the end stopping at the thing's end, at most the cap in one read). On http a range is of a page's text, in bytes of UTF-8, with `?as=text` or with no `as`; a cut inside a character reads as the replacement mark at that edge. A range on `rendered`, on `stat`, on a listing or on something that is not a page is refused as `bad-facet`, not dropped [shipped: tinypeek#8], `cursor=` (the `nextCursor` of a paged listing).
 
 **Rule:** an unsupported facet returns `bad-facet` listing the valid ones, on files and collections alike. An unknown `as` is refused on every mount [shipped]. A collection offers only its listing (and, on git, `log`): a file's facet on one (`?as=stat` on an fs directory, `?as=rendered` on an http collection, `?as=stat` or `blame` on a git tree) is refused rather than dropped [shipped: TM-11]. **A parameter a mount does not take is refused too**, as `bad-facet` naming the ones it takes: `?at=` on an http page, `?lines=` anywhere. Before v0.15 it was dropped, and the answer looked like the one asked for (a page "at" a date the mount has no notion of). `cursor=` continues a listing or `?as=links`, and on anything else is refused the same way [shipped: tinypeek#13].
+
+**The time axis:** `at=` is one parameter with two spellings, and means the same thing on every mount that has a past [shipped: tinypeek#15]. A ref (a branch, a tag, a commit) names a commit, as it always did. A time, spelled as an ISO 8601 date (`2026-10-01`) or instant (`2026-10-01T12:00:00Z`, an offset allowed), names the newest commit on the main line (HEAD's first-parent line) made at or before it. A date alone is the start of that day in UTC; an instant without an offset is UTC. The two are told apart by shape, so a tag spelled like a date is reached by its commit. The clock is the committer's, which is the order the history is in; the log's `date` is the author's, and each log entry also carries `committed`, so a client can pick a time that lands on a commit it has seen. A time after the newest commit is HEAD, and will not stay so; a time before the first commit is `no-such-ref`, naming the first commit's time (§7). The echo keeps the time as it was spelled, and `?as=stat` says which commit it became, as it does for a ref.
+
+On `fs`, `at=` reads the file or directory as the repository behind it had it: for a tracked file that is the checkout's own repository, and for a page the build pulls in it is the repository the page was pulled from, which the file's `tm:repository` or `tm:generated-by` link names. HEAD is not `fs`'s default (the checkout is), so `?at=HEAD` stays in the echo. A directory at a ref lists what the repository had, so a pulled page is not in it; its `?as=stat` carries the commit and the time of the last change at or before it instead of the checkout's modification time; `latest-version` points at the checkout, and the pair into git holds at the ref (§9). A mount with no past of its own refuses `at=` as `bad-facet` and says where the past is: a page's is at its route (`tm:source`); an entity's is at its record (`tm:data`) [planned: tinypeek#21, an entity as its records had it at a time]; what is kept off this box has none here. How a client learns what times a thing has: its `version-history` link, which every file on `fs` and `git` carries, and whose entries name commits and their times. No new facet was needed for that.
 
 **The echo:** the `uri` an answer carries is the thing's identity plus every parameter the read used, as it used it: a range as the bytes it became, a clamped `n` as the number it became, a listing's page with the cursor that reached it. A parameter that only spells out the default (`?as=raw` on a file, `?at=HEAD`, `?n=20`) is the identity and is left out. So a parameter a client sent and does not see in the echo is one the server did not use, and since v0.15 that cannot happen without a refusal [shipped: tinypeek#13].
 
@@ -209,8 +213,8 @@ Never a bare 404. Every failure is structured and, where possible, teaches the c
 | Code | When | Carries |
 |---|---|---|
 | `not-found` | No such path | `nearest`: up to five names ranked by edit distance, then a shared start, then alphabetically for ties; a path whose directory is missing answers from the deepest one that exists [shipped: TM-5]. `nearest` never contains the URI that was refused, which a client following it would take round forever; `x/` offered for `x` is a different address and allowed [shipped: TM-19] |
-| `no-such-ref` | Bad `at=` | Up to five real refs (HEAD, branches, tags), ranked the same way [shipped: TM-5] |
-| `bad-facet` (on `at=`) | An `at=` that is not a ref name (`..`, a leading `-`, a space) | Refused before git sees it |
+| `no-such-ref` | Bad `at=` | Up to five real refs (HEAD, branches, tags), ranked the same way [shipped: TM-5]; for a time before the first commit, that commit's time, as `?at=` on the repository's root [shipped: tinypeek#15] |
+| `bad-facet` (on `at=`) | An `at=` that is not a ref name (`..`, a leading `-`, a space), or is shaped like a time and is not one (`2026-13-01`) | Refused before git sees it |
 | `too-large` | Over the byte cap | Byte size and a `?range=` template; for an http page's HTML, its `?as=text` and `?as=stat`; for an http page's text, its size, a `?as=text&range=` template and its `?as=stat` [shipped: tinypeek#8] |
 | `binary` | Binary content without `as=raw` | mimeType and a `?as=stat` link |
 | `bad-facet` | Unsupported `as=`, or a parameter the mount does not take | The facets that path accepts, or the parameters the mount takes [the latter shipped: tinypeek#13] |
@@ -307,10 +311,10 @@ Every response carries `links`: `{rel, href, confidence, title?, count?}`, RFC 8
 | `tm:demonstrated-by` / `tm:demonstrates` | pattern ↔ lesson | A pattern and each lesson whose cartridge uses it | [shipped: TM-16] |
 | `tm:measures` / `tm:measured-by` | lesson ↔ game | A lesson and the game it was measured beside. `exact`, by the game's key in the lesson's record; `inferred` only for a record that keeps just the name (§11) | [shipped: TM-16, public#7] |
 | `tm:cartridge` / `tm:cartridge-of` | lesson ↔ its directory in git | A lesson and its cartridge's source | [shipped: TM-16] |
-| `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse | [shipped] |
+| `tm:working-copy` / `tm:repository` | git path ↔ fs path | Checked-out file; inverse. At a ref the pair holds at that ref, both ends carrying the same `at=` (§6) | [shipped]; at a ref since tinypeek#15 |
 | `tm:pins` | submodule → repository at the pinned commit | The repository and commit a submodule names. Unpaired: a repository does not list everything that embeds it | [shipped: TM-19] |
 | `version-history` (IANA) | any → `?as=log` | Commits touching this | [shipped] |
-| `latest-version` (IANA) | `?at=<ref>` → HEAD | Newest revision | [shipped] |
+| `latest-version` (IANA) | `?at=<ref>` → HEAD; on fs, → the checkout | Newest revision | [shipped] |
 | `alternate` (IANA) | any → same path, other facet | Another representation of one identity (`?as=rendered`, `?as=blame`) | [shipped] |
 | `alternate` (IANA) | page → the same page in another locale, or on another site | Another version of the page, its `title` naming which. The other locale only where the site's build made both; the other site only where both sites serve the page. Each condition reads the same from either end, so every link is answered. A site's root is its front page as well as its top collection, so it carries the front page's versions too | [shipped: TM-20] |
 | `up` (IANA) | any → parent | One level up; a mount root's `up` is `tm://<host>/`, and a host root's is `tm://` (§5) [shipped: tinypeek#10] | [shipped] |
@@ -445,6 +449,7 @@ So the platform was close and not finished. The grammar and the transport held w
 ## 12. Settled questions, conformance and v2
 
 - **Multi-host.** Settled (tinypeek#10): a server answers for a set of hosts and one is enough (§5). What stays open is federation between servers, which waits for a second box.
+- **One time axis.** Settled (tinypeek#15): `at=` is a ref or a time, with one meaning on every mount that has a past (§6). An entity at a time is planned (tinypeek#21).
 - **Subscriptions.** Settled (tinypeek#11): none, and a client reads `?as=stat` again (§4). A real need to know within seconds, or tokens, would reopen it.
 - **CI conformance.** [shipped: TM-15] A link-integrity crawler runs at the end of every `tinymachines` deploy, after the beta follows: every `href` resolves, no `up` names itself, every `tm:` pair has its inverse (§9's bounded exception included), every listed child resolves with the claimed mimeType. About 3,200 URIs a run with the entity mount (2,300 before it). It holds the five entity pairs to the same confidence and the same `count` at both ends. It fails a read over the link cap, and walks `?as=links` wherever a read points there (every link once, as many as it said), so an inverse on a later page still counts [shipped: tinypeek#2]. And a run whose budget ends with URIs still queued fails instead of passing on what it reached [shipped: TM-16].
 
@@ -478,6 +483,7 @@ Newest last. A version that changed behaviour says when it went live; one that s
 | v0.14 | Records the owner's decision on tokens (tinypeek#5): they stay planned and unbuilt, because nothing the server serves needs one, and when they come they add access and take none away. §10 has the reasons and the rules a build must keep. No behaviour changes, and with it nothing in §12 is left open. |
 | v0.14.1 | Editorial: this history moved out of the opening paragraph into a table, and §12 was renamed for what it now holds. No behaviour changes. |
 | v0.15 | Closes the one place the namespace still dropped something quietly (tinypeek#13, found by the first walk of the live server for the lens): a parameter a mount does not take is refused, naming the ones it takes; the echo carries every parameter a read used; and the templates name every parameter, so a client learns a mount's grammar from the server. §5, §6 and §7 say so. A client that sent a harmless extra parameter now gets a refusal; none was known to. It went live on 2026-10-15 and was re-checked from outside: the two addresses the lens found are refused, a log echoes its `n`, and the templates list names every parameter. |
+| v0.16 | Takes up the first of the lens's ideas (tinypeek#15): one time axis. `at=` is a ref or a time, with one meaning on every mount that has a past, and `fs` now takes it, reading a file as the repository behind it had it. A log entry says when its commit was made. A mount with no past refuses it and says where the past is; an entity at a time stays planned (tinypeek#21). §5, §6, §7 and §9 say so. Not yet live. |
 
 ---
 

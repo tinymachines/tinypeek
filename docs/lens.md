@@ -89,6 +89,8 @@ A mount with no past refuses it.
 
 **Open:** whether a time and a ref share one parameter, and how a client learns what times a thing has (a `?as=log` for every mount?).
 
+**Settled in spec v0.16 (tinypeek#15).** One parameter, two spellings told apart by shape: a ref names a commit, a time names the newest commit on the main line made at or before it. `fs` takes it as the repository behind the file. A thing's times are at its `version-history` link, so no new facet. A mount with no past refuses it and says where the past is; an entity at a time is tinypeek#21.
+
 ### 2. A piece of a thing you can read
 
 **Today:** an `href` may end in a fragment, which names a place inside the thing; an entity's `tm:data` carries a JSON pointer. The server ignores the fragment and reads the whole thing (§9). `?range=` reads bytes.
