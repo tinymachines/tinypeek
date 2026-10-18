@@ -25,6 +25,8 @@ export const APP: AppConfig = {
     { path: "/explainer", title: "The explainer", card: "plain", index: true, kicker: "explainer", description: "The plain-language companion to the spec: what MCP gives you, what tinypeek adds, and where each layer stops." },
     { path: "/family", title: "Who does what", card: "plain", index: true, kicker: "the tiny family", description: "The four projects around the protocol, and the line that keeps them clean: only helpers write." },
     { path: "/showcase", title: "Built on it", card: "plain", index: true, kicker: "showcase", description: "tinylens, tinyhelper and tinyagent: what each does, shown on real reads where they are public." },
+    { path: "/scan", title: "Scan a code", card: "plain", index: true, kicker: "scan",
+      description: "Read a QR code with the camera or from a photo, on this phone, and see what it holds before anything opens." },
     { path: "/theme", title: "Themes", card: "theme", index: true, kicker: "theme", description: "Pick, build and share a theme, set the text size and the font. Every theme is checked for contrast before it can be kept." },
     { path: "/app", title: "This app", card: "plain", index: true, kicker: "app", description: "Install it on your phone or computer. It works offline." },
     { path: "/share", title: "Shared with tinypeek", card: "plain", index: false, kicker: "share", description: "What you have shared here from other apps. It lands in Your files." },
@@ -44,6 +46,7 @@ export const APP: AppConfig = {
     ] },
     { id: "you", title: "You", hint: "Your account, your files, how the app looks, this device.", pages: [
       { href: "/account", title: "Your account", hint: "A passkey.", me: true },
+      { href: "/scan", title: "Scan a code", hint: "A QR code, with the camera or from a photo." },
       { href: "/theme", title: "Themes", hint: "Colours, text size, the reading font." },
       { href: "/files", title: "Your files", hint: "Kept here and, signed in, in your account." },
       { href: "/share", title: "Shared with tinypeek", hint: "What other apps sent here." },

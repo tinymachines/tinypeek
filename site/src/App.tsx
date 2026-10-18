@@ -7,6 +7,7 @@ import { SiteFooter } from "@tinymachines/kit/components/SiteFooter";
 import { UpdateBar } from "@tinymachines/kit/components/UpdateBar";
 import { SharePanel } from "@tinymachines/kit/components/SharePanel";
 import ThemePage from "@tinymachines/kit/pages/ThemePage";
+import ScanPage from "@tinymachines/kit/pages/ScanPage";
 import SharePage from "@tinymachines/kit/pages/SharePage";
 import AppPage from "@tinymachines/kit/pages/AppPage";
 import Account from "@tinymachines/kit/pages/Account";
@@ -36,6 +37,7 @@ export function App() {
   else if (doc) page = <Doc doc={doc} />;
   else if (path === "/showcase") page = <Showcase />;
   else if (path === "/theme") page = <ThemePage />;
+  else if (path === "/scan") page = <ScanPage />;
   else if (path === "/share") page = <SharePage />;
   else if (path === "/app") page = <AppPage />;
   else if (path === "/account") page = <Account />;
