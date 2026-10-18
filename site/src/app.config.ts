@@ -57,6 +57,7 @@ export const APP: AppConfig = {
     { id: "spec", label: "The spec", href: "/spec" },
     { id: "lens", label: "tinylens", href: "/lens/" },
     { id: "explainer", label: "The explainer", href: "/explainer" },
+    { id: "scan", label: "Scan", href: "/scan" },
     { id: "theme", label: "Themes", href: "/theme" },
     { id: "app", label: "This app", href: "/app" },
     { id: "files", label: "Your files", href: "/files" },
