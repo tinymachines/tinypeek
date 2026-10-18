@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.20. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.21. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
@@ -96,9 +96,9 @@ and 2026-10-16 the owner took them up in order: the refused parameter
 (v0.15, #13), one time axis (v0.16, #15), a readable piece (v0.17, #16), an
 address for a set (v0.18, #17), a trail (v0.19, #18), and hosts that are not
 machines, decided and not built (v0.20, #19). Each has its reasons in the
-spec and a settled line in `docs/lens.md`. What is still open: #20
-(tinyhelper's first ask, the owner's step) and #21 (an entity at a time, an
-idea with a planned marker in §6).
+spec and a settled line in `docs/lens.md`. An entity at a time
+(#21) was built as v0.21 on 2026-10-18. What is still open: #20
+(tinyhelper's first ask, the owner's step).
 
 Apart from those, nothing is left open. The owner's work package (a black-box audit of the
 namespace, TM-1 to TM-20) is finished and live; it lives in the owner's docs
