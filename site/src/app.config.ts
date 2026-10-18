@@ -63,5 +63,5 @@ export const APP: AppConfig = {
     { id: "files", label: "Your files", href: "/files" },
     { id: "account", label: "Account", href: "/account" },
   ],
-  defaultShortcuts: ["spec", "lens"],
+  defaultShortcuts: ["spec", "lens", "scan"],
 };
