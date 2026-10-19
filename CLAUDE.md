@@ -97,10 +97,12 @@ and 2026-10-16 the owner took them up in order: the refused parameter
 address for a set (v0.18, #17), a trail (v0.19, #18), and hosts that are not
 machines, decided and not built (v0.20, #19). Each has its reasons in the
 spec and a settled line in `docs/lens.md`. An entity at a time
-(#21) was built as v0.21 on 2026-10-18. What is still open: #20
-(tinyhelper's first ask, the owner's step).
+(#21) was built as v0.21 on 2026-10-18. tinyhelper's first ask through
+the site (#20) was made and checked live on 2026-10-19: the site fronts it
+at `/helper/`, and tinylens's `check-kit --live --helper` asks through it
+with the token in `TINYHELPER_TOKEN`, never on a command line.
 
-Apart from those, nothing is left open. The owner's work package (a black-box audit of the
+Nothing is left open. The owner's work package (a black-box audit of the
 namespace, TM-1 to TM-20) is finished and live; it lives in the owner's docs
 folder beside these repositories, under `feedback/`, and is in neither
 repository. Every issue filed here from the spec's open items is closed. The

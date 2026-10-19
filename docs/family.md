@@ -31,6 +31,7 @@ The site lives in this repository and serves:
 
 - **The protocol**: the spec and the plain-language explainer, as they are here.
 - **tinylens**: the browser itself, reading the live namespace from the visitor's browser. The namespace allows any origin, so no proxy is needed.
+- **tinyhelper's answers**, at `/helper/`. The ask box in tinylens asks there with the helper's token, and anyone can read what was answered.
 - **Showcases** of tinylens, tinyhelper and tinyagent: what each does, shown on real reads where they are public.
 
 Two things it never shows:
@@ -53,4 +54,4 @@ This is a change to what this repository holds. Until now it held the protocol o
 
 - The site's design: the family look is the owner's, as everywhere else.
 - How the site is deployed and on which name.
-- How a helper's findings are made public, if any ever are. Private is the default.
+- Whether any finding besides an answer is ever made public. An answer is made from the public namespace, so a read without the token sees it; every other driver's finding needs the token. Private stays the default.
