@@ -1,6 +1,6 @@
 # The tm:// Stack — What MCP Gives Us, What We Built, and Where to Stop
 
-**Companion to the [tm:// Protocol Spec](../spec/tm-protocol-spec.md) · last brought up to date 2026-10-11, for v0.14**
+**Companion to the [tm:// Protocol Spec](../spec/tm-protocol-spec.md) · last brought up to date 2026-10-19, for v0.21**
 
 This is the plain-language version. The spec says *what* the protocol is; this says *why it's shaped that way* and how to think about building on it.
 
@@ -109,7 +109,7 @@ Quick checks to run whenever you add something:
 Because layers 1–4 don't know what they're pointing at, the same stack applies wherever things have identities and relationships. Each of these is a new mount or a new application, not a new protocol:
 
 - **More of the box.** Hosts and hardware (an osquery- or Redfish-backed mount), installed packages (purl identities), running services.
-- **Other boxes.** The grammar already has `host`, and a server answers for a set of them, listed at `tm://`. Today the set is one. How two separate servers would find each other is not decided, and waits for a second box.
+- **Other boxes.** The grammar already has `host`, and a server answers for a set of them, listed at `tm://`. Today the set is one. How two separate servers would find each other is not decided, and waits for a second box. A host need not be a machine, either: a device, a bench or a place can come as a mount of a host that answers or as a host of its own (spec §5, v0.20).
 - **Code at symbol level.** SCIP/LSIF symbols as addressable entities, linked to the files and pages they appear in.
 - **The entity index.** Per-kind identity (content hashes, SWHID for git objects, canonical URLs for pages) with an `edges(src, rel, dst, confidence, observed_at)` table — the resolver serves live views, the index answers graph queries.
 
@@ -117,14 +117,25 @@ Keep scope honest: each new area is valuable only if it fits the existing layers
 
 ---
 
-## 7. Status snapshot (2026-10-11)
+## 7. Status snapshot (2026-10-19)
 
-Everything the spec describes is live on `tinymachines`, and nothing in it is open. The spec's version history says what each version changed.
+Everything the spec describes is live on `tinymachines`, except tokens, which wait on a reason. The spec's version history says what each version changed and when it went live.
 
-- **The platform, layers 1 to 4.** Five mounts under one grammar (`fs`, `git`, `http`, `offbox`, `entity`), facets for other representations, refusals that name the nearest addresses that do resolve, and typed links with their inverses. A link crawler reads the whole namespace at the end of every deploy, about 3,200 addresses, and fails the deploy on a link that does not resolve or a pair with one end missing.
+- **The platform, layers 1 to 4.** Five mounts under one grammar (`fs`, `git`, `http`, `offbox`, `entity`), facets for other representations, refusals that name the nearest addresses that do resolve, and typed links with their inverses. A link crawler reads the whole namespace at the end of every deploy, about 3,270 addresses, and fails the deploy on a link that does not resolve or a pair with one end missing.
 - **The first application.** The entity mount gives patterns, games, routines and lessons addresses and links of their own. Building it left the grammar and the transport alone. The resolver needed one hook so a mount can answer for a link another mount starts, and two vocabulary rules had been written around pages and had to be widened. The spec's section 11 has the table.
+- **The second test, a browser.** tinylens, a browser for `tm://` served on the tinypeek site at `/lens/`, was built over the live server to find where the addressing bends (`docs/lens.md`). Its first walk found one: a parameter a mount did not take was dropped without a word. Since v0.15 it is refused, naming the ones the mount takes. Then its five ideas were taken up in order:
+  - **One time axis** (v0.16). `at=` is a ref or a time on every mount that has a past, so a file on `fs` reads as its repository had it then. A mount with no past refuses it and says where the past is.
+  - **A readable piece** (v0.17). `lines=` and `pointer=` sit beside `range=`, and the answer's address keeps the span, so a quote keeps where it came from.
+  - **An address for a set** (v0.18). `?as=links` narrowed by one `rel=` and a lower bound on count, `min=`. One rel and one bound, and no joins: past that it would be a query language.
+  - **A trail** (v0.19). A named list of steps is a JSON file in a repository, linked to each step and back from each one, and the crawler holds the pair. No grammar change.
+  - **Hosts that are not machines** (v0.20). Decided, not built: the first device or place with readable state decides whether it comes as a mount or as a host.
+  - **An entity at a time** (v0.21). The entity mount reads its records as the repository had them, so pad-poll at 2026-10-01 is found in 19 games and demonstrated by no lesson, and at 2026-10-10 by 23.
+
+  Every one of them arrived as a facet, a file or a decision. The grammar and the transport did not change, which is the layer test of section 4 passing a second time.
+- **Answers to questions.** tinyhelper, the one member of the family that writes, runs behind the site at `/helper/`. The lens's ask button sends it a question about a thing, with the helper's token, and the answer comes back as a finding with an address of its own on `tm://helper/`, its citations checked against the namespace. A finding is generated, never measured, and the link that reaches it says so. Anyone can read an answer; any other kind of finding needs the token.
 - **Bounds.** No read carries more than 100 links, and the rest is a page at a time behind `?as=links`. Every read is held to a byte cap and reads in ranges past it. A git tree reads to a stated depth. Each caller has a rate limit.
 - **Record keeping.** The server keeps a record of each request with no address in it, bounded in days and in bytes, and never served. No refusal names anything about the host.
 - **Hosts.** A server answers for a set of hosts and a set of one is enough. `tm://` lists them.
-- **Decided and not built, each with its reasons in the spec:** a link manifest emitted by the site's build (section 8), subscriptions (section 4), and tokens (section 10). Tokens wait for a mount that is not public; when they come, anonymous reads of public things stay.
+- **Decided and not built, each with its reasons in the spec:** a link manifest emitted by the site's build (section 8), subscriptions (section 4), tokens (section 10), and hosts that are not machines (section 5). Tokens wait for a mount that is not public; when they come, anonymous reads of public things stay.
 - **Deferred until there is a second box:** how two servers would find each other.
+- **Not covered here:** the pattern records say how often and where a pattern occurs, not what it is, so an answer about a pattern can only go by its name. Whether they should carry a description, or a link to the rule that finds them, is open.
