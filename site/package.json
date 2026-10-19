@@ -11,10 +11,11 @@
     "lint": "eslint . --max-warnings 0",
     "serve": "kit serve",
     "check": "kit check --proxy /helper/=http://127.0.0.1:7420/",
-    "deploy": "kit deploy"
+    "deploy": "kit deploy",
+    "unit": "kit unit"
   },
   "dependencies": {
-    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.3.24",
+    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.3.25",
     "marked": "^18.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

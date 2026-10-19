@@ -4,8 +4,8 @@
 # /api/v1/health. StateDirectory makes /var/lib/tinypeek-api (0700) as $STATE_DIRECTORY. Logs: journalctl -u tinypeek-api.
 #
 # The repository is public, so this file names no user and no home path: @USER@ and @HERE@ (the checkout) are filled
-# in by scripts/api-setup.sh, which installs the result in /etc/systemd/system. Do not `sudo cp` this file as it is,
-# and do not run `kit setup` here (it would copy it as it is).
+# in by the kit's `kit unit` (bun run unit), which installs the result in /etc/systemd/system. Do not `sudo cp` this
+# file as it is, and do not run `kit setup` here (the vhost is scripts/site-setup.sh's).
 
 [Unit]
 Description=tinypeek API (FastAPI), tinypeek.tinymachines.ai/api

@@ -31,7 +31,7 @@ the kit's `kitapi`, `tinypeek-api.service` on `127.0.0.1:8200`, with `uv` (`uv r
 answers only the kit's base routes, `/api/v1/health`, `/about` (the manifest and the commit running) and `/whoami`.
 nginx sends the kit's account routes (sign-in, the account, Your files, push) to the kit's shared account service and
 the rest of `/api/` here, path kept. The repository is public, so `deploy/tinypeek-api.service` names no user and
-no home path: `scripts/api-setup.sh` fills them in and installs it. `kit check` runs a copy of `api/` from the
+no home path: `bun run unit` (the kit's `kit unit`, sudo) fills them in, installs it and starts it. `kit check` runs a copy of `api/` from the
 checkout; `kit deploy` restarts the service.
 
 ## The helper
@@ -63,7 +63,7 @@ Deploying is the owner's word. `scripts/site-setup.sh` makes the nginx site and 
 | `scripts/lens.ts` | the lens copied in from the submodule |
 | `scripts/check-site.ts` | the check (`bun run check` runs it against the served build) |
 | `scripts/site-setup.sh`, `scripts/site-dns.sh` | the host, once (`bun run deploy` after every checked commit) |
-| `scripts/api-setup.sh`, `api/`, `deploy/`, `app.yaml` | the site's own API: its unit installed with the user and path filled in, its code, its manifest |
+| `bun run unit`, `api/`, `deploy/`, `app.yaml` | the site's own API: its unit installed with the user and path filled in, its code, its manifest |
 
 ## Not covered
 
