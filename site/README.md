@@ -24,6 +24,16 @@ git submodule update --init         # once, after a clone
 
 To move the lens forward: `git -C extern/tinylens fetch && git -C extern/tinylens checkout <commit>`, then commit `extern/tinylens`, so this repository never points at a commit the lens's repository does not have.
 
+## The API
+
+`api/` is the site's own API (2026-10-18, the kit's standard layout, with `app.yaml` as the manifest): FastAPI on
+the kit's `kitapi`, `tinypeek-api.service` on `127.0.0.1:8200`, with `uv` (`uv run --directory api pytest`). Today it
+answers only the kit's base routes, `/api/v1/health`, `/about` (the manifest and the commit running) and `/whoami`.
+nginx sends the kit's account routes (sign-in, the account, Your files, push) to the kit's shared account service and
+the rest of `/api/` here, path kept. The repository is public, so `deploy/tinypeek-api.service` names no user and
+no home path: `scripts/api-setup.sh` fills them in and installs it. `kit check` runs a copy of `api/` from the
+checkout; `kit deploy` restarts the service.
+
 ## The helper
 
 tinyhelper, which keeps the answers to questions asked in LensKit, runs on the box as a user service on loopback, and the site fronts it at `/helper/` (an nginx location in `scripts/site-setup.sh`). The app's service worker passes `/helper/` through and the app treats it as outside, so the shell never answers there. Asking needs the helper's token; a read without it sees only the answers the `ask` driver made. The check reaches the same service through the kit's proxy, so the helper must be running for the check to pass.
@@ -53,6 +63,7 @@ Deploying is the owner's word. `scripts/site-setup.sh` makes the nginx site and 
 | `scripts/lens.ts` | the lens copied in from the submodule |
 | `scripts/check-site.ts` | the check (`bun run check` runs it against the served build) |
 | `scripts/site-setup.sh`, `scripts/site-dns.sh` | the host, once (`bun run deploy` after every checked commit) |
+| `scripts/api-setup.sh`, `api/`, `deploy/`, `app.yaml` | the site's own API: its unit installed with the user and path filled in, its code, its manifest |
 
 ## Not covered
 

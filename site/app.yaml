@@ -1,0 +1,9 @@
+# tinypeek's manifest: what the site is, in a few plain fields (the kit's py/src/kitapi/manifest.py says what goes
+# in it). kit check holds it to src/app.config.ts; the API serves it at /api/v1/about; tinykit's Home lists it.
+id: tinypeek
+name: tinypeek
+site: https://tinypeek.tinymachines.ai
+what: "The tm:// protocol: every real thing on a machine has an address, with its spec, the lens to browse it, and what is built on it."
+api: { port: 8200 }
+show: true
+order: 57

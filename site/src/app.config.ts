@@ -15,8 +15,10 @@ export const APP: AppConfig = {
   logo: "/logo.svg",
   build,
   theme: { default: "paper" },
-  // the kit's shared account service (nginx sends /api/ to it) and Your files at /files
+  // the kit's shared account service (nginx sends its routes under /api/ to it) and Your files at /files
   yourFiles: "/files",
+  // tinypeek's own API (api/, tinypeek-api.service), FastAPI on the kit's kitapi: the rest of /api/; app.yaml says the same port
+  api: { port: 8200 },
   // the lens and the helper are served beside the app, not by it: a link to /lens/ or /helper/ is a full load
   outside: /^\/(lens|helper)(\/|$)/,
   pages: [

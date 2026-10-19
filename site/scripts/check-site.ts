@@ -160,6 +160,14 @@ ok(/^tm:\/\/ Protocol Spec/.test(await text("main .doc .body h1")), `offline: /s
 await page.setOfflineMode(false);
 offline = false;
 
+// tinypeek's own API (api/, the kit's kitapi), through the same /api/ the pages use: the base routes, as this site at HEAD
+const head = Bun.spawnSync(["git", "rev-parse", "--short", "HEAD"]).stdout.toString().trim();
+const baseJson = (path: string) => fetch(`${origin}${path}`, { headers: { "cache-control": "no-cache" } }).then((r) => r.ok ? r.json() : { status: r.status }).catch(() => null);
+const [bHealth, bAbout, bWhoami] = await Promise.all([baseJson("/api/v1/health"), baseJson("/api/v1/about"), baseJson("/api/v1/whoami")]);
+ok(bHealth?.ok === true && bHealth.app === "tinypeek", `the API answers /api/v1/health (${JSON.stringify(bHealth)})`);
+ok(bAbout?.id === "tinypeek" && bAbout.commit === head, `/api/v1/about: ${bAbout?.id} at ${bAbout?.commit ?? "no answer"} (HEAD ${head}), kitapi ${bAbout?.kitapi}`);
+ok(bWhoami?.signed_in === false, `/api/v1/whoami, signed out: nobody (${JSON.stringify(bWhoami)})`);
+
 ok(errors.length === 0, errors.length ? `page errors: ${errors.join(" | ").slice(0, 400)}` : "no page errors anywhere");
 await browser.close();
 console.log(fails ? `check-site: ${fails} FAILED` : "check-site: ALL OK");
