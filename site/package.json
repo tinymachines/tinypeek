@@ -15,7 +15,7 @@
     "unit": "kit unit"
   },
   "dependencies": {
-    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.3.25",
+    "@tinymachines/kit": "git+ssh://git@github.com/tinymachines/kit.git#v0.3.27",
     "marked": "^18.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
