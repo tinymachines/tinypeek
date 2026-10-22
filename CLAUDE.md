@@ -105,7 +105,7 @@ with the token in `TINYHELPER_TOKEN`, never on a command line.
 **The v0.22 handoff is the open work** (`docs/tm-v0_22-handoff.md`, written
 2026-10-21). Four additions, in build order: the `mcp` mount (§13, built as
 v0.22 on 2026-10-22, tinypeek#22, live the same day), kinds and media types
-(§14, built as v0.23 on 2026-10-22, tinypeek#23), panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). The mount's side of tinyhelper#6, reading a map (§13.1), was built as v0.24 on 2026-10-22; the derived maps themselves are tinyhelper's and land under public's `notes/maps/`. Its
+(§14, built as v0.23 on 2026-10-22, tinypeek#23), panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). The mount's side of tinyhelper#6, reading a map (§13.1), was built as v0.24 on 2026-10-22; the derived maps themselves are tinyhelper's and sit under public's `notes/maps/` (three written 2026-10-22: terrapulse with an override, resume, campaignbrain). Its
 section 4 has the issue texts and the order; its section 6 records the
 decisions taken on 2026-10-22 (one host, maps under public's `notes/maps/`,
 searches stay tools) and the ones still open (a name for the whole). The
