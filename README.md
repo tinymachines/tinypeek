@@ -45,11 +45,11 @@ MCP gives you addresses and a read verb. It doesn't give you a graph between the
 
 ## Status
 
-Spec v0.21. Everything it describes is live on the reference deployment and checked from outside, and no question in it is open. Three things were decided and not built, each with its reasons in the spec: a build-emitted link manifest, subscriptions, and tokens.
+Spec v0.22. Everything it marks shipped is live on the reference deployment and checked from outside. The v0.22 handoff (`docs/tm-v0_22-handoff.md`) is the open work: the `mcp` mount is built (section 13), and kinds and media types, panels, and writes are planned with the issues that build them (sections 14 to 16). Three things were decided and not built, each with its reasons in the spec: a build-emitted link manifest, subscriptions, and tokens.
 
 ## Reference deployment
 
-The `tinymachines` server runs the protocol live over its `fs`, `git`, `http` and `offbox` mounts and an `entity` mount, the first application built on them, and serves this repository at `tm://tinymachines/git/tinypeek/`. The endpoint is `https://tinymachines.ai/api/mcp`, open to any MCP client with no token, and the [setup guide](https://tinymachines.ai/docs/mcp-setup-guide) says how to connect. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
+The `tinymachines` server runs the protocol live over its `fs`, `git`, `http` and `offbox` mounts, an `entity` mount, the first application built on them, and an `mcp` mount, the second, which reads other MCP servers as mounts of the host, and serves this repository at `tm://tinymachines/git/tinypeek/`. The endpoint is `https://tinymachines.ai/api/mcp`, open to any MCP client with no token, and the [setup guide](https://tinymachines.ai/docs/mcp-setup-guide) says how to connect. It's included as a submodule of [`tinymachines/public`](https://github.com/tinymachines/public) at `extern/tinypeek`.
 
 ## License
 
