@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.22. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.23. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
@@ -104,8 +104,8 @@ with the token in `TINYHELPER_TOKEN`, never on a command line.
 
 **The v0.22 handoff is the open work** (`docs/tm-v0_22-handoff.md`, written
 2026-10-21). Four additions, in build order: the `mcp` mount (§13, built as
-v0.22 on 2026-10-22, tinypeek#22), kinds and media types (§14, tinypeek#23),
-panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). Its
+v0.22 on 2026-10-22, tinypeek#22, live the same day), kinds and media types
+(§14, built as v0.23 on 2026-10-22, tinypeek#23), panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). Its
 section 4 has the issue texts and the order; its section 6 records the
 decisions taken on 2026-10-22 (one host, maps under public's `notes/maps/`,
 searches stay tools) and the ones still open (a name for the whole). The
@@ -122,7 +122,7 @@ What a session picking this up should know that the spec does not say:
 
 | | |
 |---|---|
-| Where things are in the code | The entity mount is the `Entities` class in `api/tm.py`, with one resolver hook (`inbound`). The mcp mount is the `Mcp` class there, its servers in `api/mcp_servers.json`; a server's token is named in that file and held in the service's environment, never in a repository. The rate limit and the request log are `RateLimit` and `AuditLog` in `api/mcp_server.py`; `api/app.py` passes the caller. `tm://` is `TOP` in `api/tm.py` |
+| Where things are in the code | The entity mount is the `Entities` class in `api/tm.py`, with one resolver hook (`inbound`). The mcp mount is the `Mcp` class there, its servers in `api/mcp_servers.json`; a server's token is named in that file and held in the service's environment, never in a repository. The kind registry is the `Kinds` class there, its counts in `tm-kinds.json` in the service's state directory (`kinds_file_from_env`), never under the checkout; the vocabulary is `KINDS`, and the one place a link is given its target's type is `Namespace.target_type`. The rate limit and the request log are `RateLimit` and `AuditLog` in `api/mcp_server.py`; `api/app.py` passes the caller. `tm://` is `TOP` in `api/tm.py` |
 | Checks that cannot be made from outside | The request log is in the service's state directory and is not served, so checking it is a look on the box. No live page's text is over the byte cap, so that refusal is held by the tests |
 | One bucket for the box | Sessions on the box share one address, so a crawl over HTTP from any of them draws on one rate bucket. The crawler runs in-process and is not limited |
 | Known and stated | A caller inside the rate limit can still fill a day's 8 MiB of the request log by volume |
