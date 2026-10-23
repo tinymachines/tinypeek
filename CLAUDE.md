@@ -11,7 +11,7 @@ is connected to. This repository holds the protocol only:
 
 | | |
 |---|---|
-| `spec/tm-protocol-spec.md` | the spec, v0.26, live. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
+| `spec/tm-protocol-spec.md` | the spec, v0.27, built 2026-10-23 and live on the next `public` deploy. Its version history is at the end. Every section is marked `[shipped]`, `[partial]` or `[planned]`, with the ticket that moves it |
 | `docs/stack-explainer.md` | the plain-language companion; its section 7 is a status snapshot |
 | `README.md` | the front page |
 | `docs/family.md` | who does what: tinypeek, tinylens, tinyhelper and tinyagent, and the public site this repository now carries (decided 2026-10-12) |
@@ -105,7 +105,7 @@ with the token in `TINYHELPER_TOKEN`, never on a command line.
 **The v0.22 handoff is the open work** (`docs/tm-v0_22-handoff.md`, written
 2026-10-21). Four additions, in build order: the `mcp` mount (§13, built as
 v0.22 on 2026-10-22, tinypeek#22, live the same day), kinds and media types
-(§14, built as v0.23 on 2026-10-22, tinypeek#23), panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). Outside the handoff, the owner asked on 2026-10-22 for a second site on the http mount (tinypeek#24): built as v0.25 on 2026-10-23, it reads the site's sitemap and robots and nothing else, and it reopened the manifest (tinypeek#9) with two sites to design against; a git mount for that site waits on the manifest and the owner's word. The server half of tinylens#2 (§15: the manifest and `?as=blocks`) was built as v0.26 on 2026-10-23; the lens's half (the static page that renders blocks, the walk) and tinylens#3 are the lens session's, briefed on tinylens#2. Both sides of tinyhelper#6 (§13.1, the map) were built as v0.24 and went live on 2026-10-22; the derived maps are tinyhelper's and sit under public's `notes/maps/` (terrapulse with an override, resume, campaignbrain). Its
+(§14, built as v0.23 on 2026-10-22, tinypeek#23), panels (§15, tinylens#2 and #3) and writes (§16, tinyhelper#6 to #8). Outside the handoff, the owner asked on 2026-10-22 for a second site on the http mount (tinypeek#24): built as v0.25 on 2026-10-23, it reads the site's sitemap and robots and nothing else, and it reopened the manifest (tinypeek#9) with two sites to design against; a git mount for that site waits on the manifest and the owner's word. The server half of tinylens#2 (§15: the manifest and `?as=blocks`) was built as v0.26 on 2026-10-23; the lens's half (the static page that renders blocks, the walk) and tinylens#3 are the lens session's, briefed on tinylens#2. Both sides of tinyhelper#6 (§13.1, the map) were built as v0.24 and went live on 2026-10-22; the derived maps are tinyhelper's and sit under public's `notes/maps/` (terrapulse with an override, resume; campaignbrain's was retired with the server on 2026-10-23, tinypeek#25). Its
 section 4 has the issue texts and the order; its section 6 records the
 decisions taken on 2026-10-22 (one host, maps under public's `notes/maps/`,
 searches stay tools) and the ones still open (a name for the whole). The
