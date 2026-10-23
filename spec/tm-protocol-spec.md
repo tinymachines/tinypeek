@@ -155,7 +155,7 @@ tm://{host}/http/{site}{/path*}{?as,range,lines,rel,min,cursor}
 tm://{host}/offbox/{name}{?as,rel,min}
 ```
 
-These are the templates the live server publishes. **Each names every parameter its mount takes**, and a read refuses any other (§6), so a client can learn a mount's whole grammar from the server and need not carry a list of its own. Until v0.15 the templates named fewer parameters than the server took (`as` and `range` on `fs`, `range` on `git`, `cursor` on any collection), and tinylens carried the difference itself [shipped: tinypeek#13]. `tm://` and a host's root take `?as=links` only, with its `rel=` and `min=` (§9); `cursor=` rides with `?as=links` on anything (§6), which the two literal templates do not spell out.
+These are the templates the live server publishes. **Each names every parameter its mount takes**, and a read refuses any other (§6), so a client can learn a mount's whole grammar from the server and need not carry a list of its own. Until v0.15 the templates named fewer parameters than the server took (`as` and `range` on `fs`, `range` on `git`, `cursor` on any collection), and tinylens carried the difference itself [shipped: tinypeek#13]. `tm://` and a host's root take `?as=links` and, since v0.26, `?as=blocks` only, with `rel=` and `min=` for the links (§9, §15); `cursor=` rides with `?as=links` on anything (§6), which the two literal templates do not spell out.
 
 The entity mount brings two more [shipped: TM-16]:
 
