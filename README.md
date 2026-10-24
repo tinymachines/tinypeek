@@ -45,7 +45,7 @@ MCP gives you addresses and a read verb. It doesn't give you a graph between the
 
 ## Status
 
-Spec v0.30. Everything it marks shipped is live on the reference deployment and checked from outside, or waits on the next deploy, and the version history says which. The v0.22 handoff (`docs/tm-v0_22-handoff.md`) is the open work: the `mcp` mount (section 13), its maps (section 13.1, so another server's data has addresses) and kinds and media types (section 14) are built, and panels and writes are planned with the issues that build them (sections 15 and 16). Two things were decided and not built, each with its reasons in the spec: subscriptions and tokens. The link manifest, once among them, was reopened by a second site and is read since v0.29 from a site that publishes one (section 8).
+Spec v0.31. Everything it marks shipped is live on the reference deployment and checked from outside, or waits on the next deploy, and the version history says which. The v0.22 handoff (`docs/tm-v0_22-handoff.md`) is the open work: the `mcp` mount (section 13), its maps (section 13.1, so another server's data has addresses) and kinds and media types (section 14) are built, and panels and writes are planned with the issues that build them (sections 15 and 16). Two things were decided and not built, each with its reasons in the spec: subscriptions and tokens. The link manifest, once among them, was reopened by a second site and is read since v0.29 from a site that publishes one (section 8).
 
 ## Reference deployment
 
