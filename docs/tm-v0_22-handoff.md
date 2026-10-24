@@ -287,7 +287,7 @@ Open from Bradley before building: is TinyKit inside Sysforge or beside it (the 
 - [x] **C. Free-text searches.** Decided 2026-10-22: tools only, under rule 2. A saved search is a trail. Nothing to build.
 - [ ] **D. Which bradley.io pages become panels first.** `/mcp` is the obvious one; scene 4 next.
 - [ ] **E. The resume as a wiki subject** is fine for the mount, but should its findings ever be public? `docs/family.md` left "whether any finding besides an answer is ever made public" open; the resume is where that gets decided.
-- [ ] **F. A name for the whole.** tinypeek is the protocol, tinylens the lens, tinyhelper the hands. The wiki the three make has no name yet, and the site will want one before the panels ship. Searchapedia was the working name. Left open on 2026-10-22; wanted before issue 5 ships.
+- [x] **F. A name for the whole.** Decided 2026-10-23: **tinypeek**. The protocol's home and the site already carry the name, so the whole is tinypeek: tm:// the grammar, tinylens to read, tinyhelper to write. Searchapedia, the working name, is retired.
 - [ ] **G. The scene-4 questions** in section 5.
 
 ---
